@@ -9,3 +9,24 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Calendar {
+  year     Int       @id
+  holidays Json
+  Planner  Planner[]
+}
+
+model Planner {
+  id           Int      @id @default(autoincrement())
+  name         String
+  start_date   DateTime
+  activities   Json
+  calendar     Calendar @relation(fields: [calendarYear], references: [year])
+  calendarYear Int
+}
+
+model Template {
+  id         Int    @id @default(autoincrement())
+  name       String
+  activities Json
+}
