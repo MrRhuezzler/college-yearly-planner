@@ -1,7 +1,58 @@
-const router = require('express').Router();
+const router = require("express").Router();
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-router.get('/', async (req, res, next) => {
-  res.send({ message: 'Ok api is working 🚀' });
+router.get("/:year", async (req, res, next) => {
+  try {
+    const { year } = req.params;
+    const yrCal = await prisma.calendar.findUnique({
+      where: {
+        year: Number(year),
+      },
+    });
+    res.send(yrCal);
+  } catch (error) {
+    next(error);
+  }
+});
+router.post("/", async (req, res, next) => {
+  try {
+    const yrCal = await prisma.calendar.create({
+      data: req.body,
+    });
+    res.send(yrCal);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/:year", async (req, res, next) => {
+  try {
+    const { year } = req.params;
+    const yrCal = await prisma.calendar.delete({
+      where: {
+        year: Number(year),
+      },
+    });
+    res.send(yrCal);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/:year", async (req, res, next) => {
+  try {
+    const { year } = req.params;
+    const yrCal = await prisma.calendar.update({
+      where: {
+        year: Number(year),
+      },
+      data: req.body,
+    });
+    res.send(yrCal);
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;
