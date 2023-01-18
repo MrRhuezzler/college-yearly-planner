@@ -1,7 +1,19 @@
 const router = require("express").Router();
 const prisma = require("../utils/dbClient");
 
-router.get("/", async(req));
+router.get("/", async (req, res, next) => {
+  try {
+    const cals = await prisma.calendar.findMany({
+      orderBy: {
+        year: "asc",
+      },
+      include: { planner: true },
+    });
+    res.send(cals);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get("/:year", async (req, res, next) => {
   try {
@@ -10,6 +22,7 @@ router.get("/:year", async (req, res, next) => {
       where: {
         year: Number(year),
       },
+      include: { Planner: true },
     });
     res.send(yrCal);
   } catch (error) {
@@ -56,5 +69,7 @@ router.patch("/:year", async (req, res, next) => {
     next(error);
   }
 });
+
+router.use("/:year/planner", require("./Planner"));
 
 module.exports = router;

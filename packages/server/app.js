@@ -9,11 +9,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 
 app.get("/", async (req, res, next) => {
-  res.send({ message: "Awesome it works 🐻" });
+  res.send({ message: "Weclcome to express" });
 });
 
-app.use("/calender", require("./routes/Calendar"));
-app.use("/planner", require("./routes/Planner"));
+app.use("/calendar", require("./routes/Calendar"));
 app.use("/template", require("./routes/Template"));
 
 app.use((req, res, next) => {

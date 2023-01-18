@@ -1,0 +1,32 @@
+###
+POST http://localhost:5000/calendar
+Content-Type: application/json
+
+{
+    "year" : 2024,
+    "holidays" : [{"Pongal" : "15/01/24"},{"Deepavali":"15/09/24"}]
+}
+
+###
+GET http://localhost:5000/calendar
+
+###
+GET http://localhost:5000/calendar/2023
+
+###
+PATCH http://localhost:5000/calendar/2023
+Content-Type: application/json
+
+{
+    "holidays": [{"name":"Birthday","date":"25/05/23"},{"name":"New year","date":"01/01/23"}]
+}
+
+###
+POST http://localhost:5000/calendar/2023/planner
+Content-Type: application/json
+
+{
+    "name" : "CA 2-Group",
+    "start_date" : "2022-10-31T09:00:00Z",
+    "calendarYear" : 2023
+}

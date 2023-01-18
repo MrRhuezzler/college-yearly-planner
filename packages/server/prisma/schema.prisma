@@ -13,7 +13,7 @@ datasource db {
 model Calendar {
   year     Int       @id
   holidays Json
-  Planner  Planner[]
+  planner  Planner[]
 }
 
 model Planner {
