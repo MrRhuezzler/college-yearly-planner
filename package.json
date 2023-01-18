@@ -8,5 +8,12 @@
   "license": "MIT",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "dev": "concurrently \"wsrun --parallel dev\""
+  },
+  "dependencies": {
+    "concurrently": "^7.6.0",
+    "wsrun": "^5.2.4"
+  }
 }
