@@ -12,7 +12,7 @@ app.get("/", async (req, res, next) => {
   res.send({ message: "Awesome it works 🐻" });
 });
 
-app.use("/calender", require("./routes/api.route"));
+app.use("/calender", require("./routes/Calendar"));
 app.use("/planner", require("./routes/Planner"));
 app.use("/template", require("./routes/Template"));
 

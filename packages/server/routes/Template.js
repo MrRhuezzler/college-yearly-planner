@@ -1,6 +1,5 @@
 const router = require("express").Router();
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../utils/dbClient");
 
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
