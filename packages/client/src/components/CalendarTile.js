@@ -5,6 +5,8 @@ const CalendarTile = ({ year, isCurrent }) => {
         isCurrent ? "border-secondary" : "border-primary"
       } p-5 flex flex-col justify-end ${
         isCurrent ? "hover:bg-secondary" : "hover:bg-primary"
+      } ${
+        isCurrent ? "focus:bg-secondary" : "focus:bg-primary"
       } hover:cursor-pointer`}
     >
       <div

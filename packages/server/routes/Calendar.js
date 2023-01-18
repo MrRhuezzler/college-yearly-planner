@@ -16,6 +16,7 @@ router.get("/:year", async (req, res, next) => {
     next(error);
   }
 });
+
 router.post("/", async (req, res, next) => {
   try {
     const yrCal = await prisma.calendar.create({

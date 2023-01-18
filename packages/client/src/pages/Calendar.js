@@ -12,7 +12,7 @@ const Calendar = () => {
           <h1 className="text-3xl font-semibold text-primary mb-2">
             Year Calendar
           </h1>
-          <h2 className="text-gray-500">Select the year</h2>
+          <h2 className="text-gray-500">Select a calendar</h2>
         </div>
         <div className="flex flex-col justify-center">
           <button className="text-primary text-4xl">
