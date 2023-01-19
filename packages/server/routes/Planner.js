@@ -1,16 +1,16 @@
 const router = require("express").Router();
 const prisma = require("../utils/dbClient");
 
-router.get("/", async (req, res, next) => {
+router.get("/:year/planner", async (req, res, next) => {
   try {
-    const plans = await prisma.planner.findMany({ orderBy: { id: "asc" } });
+    const plans = await prisma.planner.findMany({ orderBy: { id: "desc" } });
     res.send(plans);
   } catch (error) {
     next(error);
   }
 });
 
-router.get("/:id", async (req, res, next) => {
+router.get("/:year/planner/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
     const plannerobj = await prisma.planner.findUnique({
@@ -24,10 +24,15 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/:year/planner", async (req, res, next) => {
+  const { year } = req.params;
+  console.log(req.body);
   try {
     const plannerobj = await prisma.planner.create({
-      data: req.body,
+      data: {
+        ...req.body,
+        calendarYear: parseInt(year),
+      },
     });
     res.send(plannerobj);
   } catch (error) {
@@ -35,7 +40,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:year/planner/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
     const plannerobj = await prisma.planner.delete({
@@ -49,9 +54,10 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
-router.patch("/:id", async (req, res, next) => {
+router.patch("/:year/planner/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
+    console.log(req.body);
     const plannerobj = await prisma.planner.update({
       where: {
         id: Number(id),

@@ -6,7 +6,7 @@ const Navbar = () => {
       <div className="py-5 px-8">
         <Link to="/">Home</Link>
       </div>
-      <div className="w-full h-2 bg-gradient-to-r from-primary to-white"></div>
+      <div className="w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
     </div>
   );
 };

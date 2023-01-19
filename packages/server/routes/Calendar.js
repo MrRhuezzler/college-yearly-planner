@@ -5,7 +5,7 @@ router.get("/", async (req, res, next) => {
   try {
     const cals = await prisma.calendar.findMany({
       orderBy: {
-        year: "asc",
+        year: "desc",
       },
       include: { planner: true },
     });
@@ -70,6 +70,5 @@ router.patch("/:year", async (req, res, next) => {
   }
 });
 
-router.use("/:year/planner", require("./Planner"));
 
 module.exports = router;
