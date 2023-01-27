@@ -28,7 +28,7 @@ const ActivityTile = ({ index, name: n, type: t, value: v }) => {
   }, [editMode, value]);
 
   return (
-    <div className="w-full flex flex-row outline items-center outline-primary rounded-lg py-5 px-4 hover:scale-[101%] focus:scale-[101%] transition-all">
+    <div className="w-full flex flex-row outline items-center outline-primary rounded-lg py-5 px-4 transition-all mb-4">
       <button className="text-gray-400 cursor-move">
         <GiHamburgerMenu />
       </button>

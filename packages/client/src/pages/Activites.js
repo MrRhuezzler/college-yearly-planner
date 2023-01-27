@@ -7,6 +7,7 @@ import ActivitiesProvider from "../context/ActivityContext";
 import Api from "../utils/Api";
 import { PLANNER_ONE_UPDATE_DELETE } from "../utils/Endpoints";
 import { IoAddCircle } from "react-icons/io5";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const Activities = () => {
   let { year, id } = useParams();
@@ -48,15 +49,24 @@ const Activities = () => {
   const draggedItem = useRef(null);
   const draggedOverItem = useRef(null);
 
-  const handleReorder = (e) => {
-    const _activites = [...activities];
-    const draggedItemContent = {
-      ..._activites.splice(draggedItem.current, 1)[0],
-    };
-    _activites.splice(draggedOverItem.current, 0, draggedItemContent);
-    draggedItem.current = null;
-    draggedOverItem.current = null;
-    setActivities(_activites);
+  // const handleReorder = (e) => {
+  //   const _activites = [...activities];
+  //   const draggedItemContent = {
+  //     ..._activites.splice(draggedItem.current, 1)[0],
+  //   };
+  //   _activites.splice(draggedOverItem.current, 0, draggedItemContent);
+  //   draggedItem.current = null;
+  //   draggedOverItem.current = null;
+  //   setActivities(_activites);
+  // };
+
+  const handleReorder = (result) => {
+    if (!result.destination) return;
+    const items = Array.from(activities.map((v) => ({ ...v })));
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setActivities(items);
+    window.location.reload(false);
   };
 
   useEffect(() => {
@@ -166,22 +176,31 @@ const Activities = () => {
           setValue={setActivities}
           start_date={startDate}
         >
-          {activities.map((activity, index) => (
-            <div
-              key={index}
-              draggable
-              onDragStart={(e) => {
-                draggedItem.current = index;
-              }}
-              onDragEnter={(e) => {
-                draggedOverItem.current = index;
-              }}
-              onDragEnd={handleReorder}
-              onDragOver={(e) => e.preventDefault()}
-            >
-              <ActivityTile index={index} {...activity} />
-            </div>
-          ))}
+          <DragDropContext onDragEnd={handleReorder}>
+            <Droppable droppableId="activities">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {activities.map((activity, index) => (
+                    <Draggable
+                      key={`activity-${index}`}
+                      draggableId={`activity-${index}`}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <ActivityTile index={index} {...activity} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </ActivitiesProvider>
       </div>
     </div>
