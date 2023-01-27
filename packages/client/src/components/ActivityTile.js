@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { useActivity } from "../context/ActivityContext";
 import DatePicker from "react-date-picker";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 const ActivityTile = ({ index, name: n, type: t, value: v }) => {
   const [editMode, setEditMode] = useState(false);
@@ -10,6 +11,8 @@ const ActivityTile = ({ index, name: n, type: t, value: v }) => {
   const typePossibilities = ["RELATIVE", "ABSOLUTE"];
   const [value, setValue] = useState(v ? v : 0);
   const [preValue, setPreValue] = useState(v ? v : 0);
+
+  // const { onDragStart, onDragEnter, onDragEnd } = dragFunc;
 
   const { handleActivityAction, calculatedDates } = useActivity();
 
@@ -21,11 +24,14 @@ const ActivityTile = ({ index, name: n, type: t, value: v }) => {
         data: { name, type, value },
       });
     }
-    console.log(calculatedDates);
+    // console.log(calculatedDates);
   }, [editMode, value]);
 
   return (
-    <div className="w-full flex flex-row outline outline-primary rounded-lg py-5 px-4 hover:scale-[101%] focus:scale-[101%] transition-all">
+    <div className="w-full flex flex-row outline items-center outline-primary rounded-lg py-5 px-4 hover:scale-[101%] focus:scale-[101%] transition-all">
+      <button className="text-gray-400 cursor-move">
+        <GiHamburgerMenu />
+      </button>
       <div className="flex-1 grid place-items-center">
         {editMode ? (
           <div className="flex flex-row justify-center space-x-4 mb-2">

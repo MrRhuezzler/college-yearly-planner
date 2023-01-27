@@ -20,32 +20,34 @@ const Planner = () => {
   };
 
   const createPlanner = async (name) => {
-    return await Api.post(PLANNER_ALL_CREATE.replace(":year", year), {
-      name,
-      start_date: new Date().toISOString(),
-      activities: [
-        {
-          name: "Date of Commencement of Classes",
-          type: "RELATIVE",
-          value: 0,
-        },
-        {
-          name: "CA Test 1 - Date of Commencement",
-          type: "RELATIVE",
-          value: 56,
-        },
-        {
-          name: "CA Test 1 - Last Date of Mark Entry",
-          type: "RELATIVE",
-          value: 3,
-        },
-        {
-          name: "CA Test 2 - Date of Commencement",
-          type: "RELATIVE",
-          value: 56,
-        },
-      ],
-    });
+    if (createName) {
+      return await Api.post(PLANNER_ALL_CREATE.replace(":year", year), {
+        name,
+        start_date: new Date().toISOString(),
+        activities: [
+          {
+            name: "Date of Commencement of Classes",
+            type: "RELATIVE",
+            value: 0,
+          },
+          {
+            name: "CA Test 1 - Date of Commencement",
+            type: "RELATIVE",
+            value: 56,
+          },
+          {
+            name: "CA Test 1 - Last Date of Mark Entry",
+            type: "RELATIVE",
+            value: 3,
+          },
+          {
+            name: "CA Test 2 - Date of Commencement",
+            type: "RELATIVE",
+            value: 56,
+          },
+        ],
+      });
+    }
   };
 
   const [planners, setPlanners] = useState([]);
@@ -53,7 +55,6 @@ const Planner = () => {
   useEffect(() => {
     (async () => {
       const data = await getAllPlanners();
-      console.log(data);
       setPlanners(data);
     })();
   }, [showModal]);

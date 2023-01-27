@@ -6,19 +6,19 @@ const cors = require("cors");
 require("dotenv").config();
 const app = express();
 
-app.use(cors({ origin: process.env.URL || "*" }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
-app.use(express.static(path.join(__dirname, "../client/build")));
+// app.use(express.static(path.join(__dirname, "../client/build")));
 
 app.use("/api/calendar", require("./routes/Calendar"));
 app.use("/api/calendar", require("./routes/Planner"));
 app.use("/api/template", require("./routes/Template"));
 
-app.get("*", async (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../client/build/index.html"));
-});
+// app.get("*", async (req, res, next) => {
+//   res.sendFile(path.join(__dirname, "../client/build/index.html"));
+// });
 
 app.use((req, res, next) => {
   next(createError.NotFound());

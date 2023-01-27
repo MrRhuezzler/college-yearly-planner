@@ -17,10 +17,12 @@ const Calendar = () => {
   };
 
   const createCalendar = async (year) => {
-    return await Api.post(CALENDAR_ALL_CREATE, {
-      year: parseInt(year),
-      holidays: [],
-    });
+    if (createYear) {
+      return await Api.post(CALENDAR_ALL_CREATE, {
+        year: parseInt(year),
+        holidays: [],
+      });
+    }
   };
 
   useEffect(() => {

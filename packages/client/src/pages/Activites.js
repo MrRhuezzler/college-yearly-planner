@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AiFillCheckCircle } from "react-icons/ai";
 import ActivityTile from "../components/ActivityTile";
 import DatePicker from "react-date-picker";
-import ActivitiesProducer from "../context/ActivityContext";
+import ActivitiesProvider from "../context/ActivityContext";
 import Api from "../utils/Api";
 import { PLANNER_ONE_UPDATE_DELETE } from "../utils/Endpoints";
+import { IoAddCircle } from "react-icons/io5";
 
 const Activities = () => {
   let { year, id } = useParams();
@@ -42,6 +43,20 @@ const Activities = () => {
         }
       );
     }
+  };
+
+  const draggedItem = useRef(null);
+  const draggedOverItem = useRef(null);
+
+  const handleReorder = (e) => {
+    const _activites = [...activities];
+    const draggedItemContent = {
+      ..._activites.splice(draggedItem.current, 1)[0],
+    };
+    _activites.splice(draggedOverItem.current, 0, draggedItemContent);
+    draggedItem.current = null;
+    draggedOverItem.current = null;
+    setActivities(_activites);
   };
 
   useEffect(() => {
@@ -136,7 +151,7 @@ const Activities = () => {
           )}
         </div>
       </div>
-      <p className="mb-8 px-4 text-gray-400 font-pragati">
+      <p className="mb-4 px-4 text-gray-400 font-pragati">
         <span className="text-red-600">*</span>Click to edit each element
       </p>
       <div className="px-10 lg:px-20 space-y-4">
@@ -146,15 +161,28 @@ const Activities = () => {
           <p className="flex-1 text-center">Value</p>
           <p className="flex-1 text-center">Calculated Date</p>
         </div>
-        <ActivitiesProducer
+        <ActivitiesProvider
           value={activities}
           setValue={setActivities}
           start_date={startDate}
         >
           {activities.map((activity, index) => (
-            <ActivityTile key={index} index={index} {...activity} />
+            <div
+              key={index}
+              draggable
+              onDragStart={(e) => {
+                draggedItem.current = index;
+              }}
+              onDragEnter={(e) => {
+                draggedOverItem.current = index;
+              }}
+              onDragEnd={handleReorder}
+              onDragOver={(e) => e.preventDefault()}
+            >
+              <ActivityTile index={index} {...activity} />
+            </div>
           ))}
-        </ActivitiesProducer>
+        </ActivitiesProvider>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { IoAddCircle } from "react-icons/io5";
 
 const ActivityContext = createContext();
 
@@ -20,7 +21,7 @@ export const activitiesReducer = (state, action) => {
 
 export const useActivity = () => useContext(ActivityContext);
 
-const ActivitiesProducer = ({ value, setValue, start_date, children }) => {
+const ActivitiesProvider = ({ value, setValue, start_date, children }) => {
   const handleActivityAction = (action) => {
     setValue(activitiesReducer(value, action));
   };
@@ -34,7 +35,6 @@ const ActivitiesProducer = ({ value, setValue, start_date, children }) => {
       if (activity.type === "RELATIVE") {
         date.setDate(date.getDate() + activity.value);
         newDates.push(new Date(date));
-        console.log(activity);
         // date = calculated;
       } else if (activity.type === "ABSOLUTE") {
         date = new Date(activity.value);
@@ -49,10 +49,30 @@ const ActivitiesProducer = ({ value, setValue, start_date, children }) => {
   }, [value, start_date]);
 
   return (
-    <ActivityContext.Provider value={{ handleActivityAction, calculatedDates }}>
-      {children}
-    </ActivityContext.Provider>
+    <>
+      <ActivityContext.Provider
+        value={{ handleActivityAction, calculatedDates }}
+      >
+        {children}
+        <div className="w-full flex flex-row justify-center">
+          <button
+            onClick={(e) => {
+              handleActivityAction({
+                type: "CREATE",
+                data: {
+                  name: "New Activity",
+                  type: "RELATIVE",
+                  value: 0,
+                },
+              });
+            }}
+          >
+            <IoAddCircle className="text-primary hover:text-secondary text-4xl"></IoAddCircle>
+          </button>
+        </div>
+      </ActivityContext.Provider>
+    </>
   );
 };
 
-export default ActivitiesProducer;
+export default ActivitiesProvider;
