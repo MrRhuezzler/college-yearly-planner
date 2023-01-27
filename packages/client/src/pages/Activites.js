@@ -46,29 +46,6 @@ const Activities = () => {
     }
   };
 
-  const draggedItem = useRef(null);
-  const draggedOverItem = useRef(null);
-
-  // const handleReorder = (e) => {
-  //   const _activites = [...activities];
-  //   const draggedItemContent = {
-  //     ..._activites.splice(draggedItem.current, 1)[0],
-  //   };
-  //   _activites.splice(draggedOverItem.current, 0, draggedItemContent);
-  //   draggedItem.current = null;
-  //   draggedOverItem.current = null;
-  //   setActivities(_activites);
-  // };
-
-  const handleReorder = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(activities.map((v) => ({ ...v })));
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setActivities(items);
-    window.location.reload(false);
-  };
-
   useEffect(() => {
     fetchPlanner();
   }, []);
@@ -176,31 +153,23 @@ const Activities = () => {
           setValue={setActivities}
           start_date={startDate}
         >
-          <DragDropContext onDragEnd={handleReorder}>
-            <Droppable droppableId="activities">
+          {activities.map((activity, index) => (
+            <Draggable
+              key={`activity-${index}`}
+              draggableId={`activity-${index}`}
+              index={index}
+            >
               {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {activities.map((activity, index) => (
-                    <Draggable
-                      key={`activity-${index}`}
-                      draggableId={`activity-${index}`}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          <ActivityTile index={index} {...activity} />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                >
+                  <ActivityTile index={index} {...activity} />
                 </div>
               )}
-            </Droppable>
-          </DragDropContext>
+            </Draggable>
+          ))}
         </ActivitiesProvider>
       </div>
     </div>

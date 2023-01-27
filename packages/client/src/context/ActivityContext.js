@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { IoAddCircle } from "react-icons/io5";
 
 const ActivityContext = createContext();
@@ -15,7 +16,9 @@ export const activitiesReducer = (state, action) => {
       }
     });
   } else if (action.type === "DELETE") {
-    return state.filter((value) => value.index !== action.index);
+    return state.filter((value, index) => index !== action.index);
+  } else if (action.type === "REORDER") {
+    return [...action.data.map((v) => ({ ...v }))];
   }
 };
 
@@ -24,6 +27,15 @@ export const useActivity = () => useContext(ActivityContext);
 const ActivitiesProvider = ({ value, setValue, start_date, children }) => {
   const handleActivityAction = (action) => {
     setValue(activitiesReducer(value, action));
+  };
+
+  const handleReorder = (result) => {
+    if (!result.destination) return;
+    const items = Array.from(value);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    handleActivityAction({ type: "REORDER", data: items });
+    window.location.reload();
   };
 
   const [calculatedDates, setCalculatedDates] = useState([]);
@@ -53,7 +65,15 @@ const ActivitiesProvider = ({ value, setValue, start_date, children }) => {
       <ActivityContext.Provider
         value={{ handleActivityAction, calculatedDates }}
       >
-        {children}
+        <DragDropContext onDragEnd={handleReorder}>
+          <Droppable droppableId="activities">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {children}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
         <div className="w-full flex flex-row justify-center">
           <button
             onClick={(e) => {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { useActivity } from "../context/ActivityContext";
 import DatePicker from "react-date-picker";
-import { GiHamburgerMenu } from "react-icons/gi";
+import { MdDelete } from "react-icons/md";
 
 const ActivityTile = ({ index, name: n, type: t, value: v }) => {
   const [editMode, setEditMode] = useState(false);
@@ -29,8 +29,13 @@ const ActivityTile = ({ index, name: n, type: t, value: v }) => {
 
   return (
     <div className="w-full flex flex-row outline items-center outline-primary rounded-lg py-5 px-4 transition-all mb-4">
-      <button className="text-gray-400 cursor-move">
-        <GiHamburgerMenu />
+      <button
+        onClick={(e) => {
+          handleActivityAction({ type: "DELETE", index });
+        }}
+        className="text-secondary text-xl"
+      >
+        <MdDelete />
       </button>
       <div className="flex-1 grid place-items-center">
         {editMode ? (
