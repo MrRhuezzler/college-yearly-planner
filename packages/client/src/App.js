@@ -3,6 +3,8 @@ import Activities from "./pages/Activites";
 import Calendar from "./pages/Calendar";
 import Home from "./pages/Home";
 import Planner from "./pages/Planner";
+import Template from "./pages/Template";
+import TemplateActivities from "./pages/TemplateActivites";
 
 const App = () => {
   return (
@@ -13,6 +15,8 @@ const App = () => {
           <Route path="calendar" element={<Calendar />} />
           <Route path="calendar/:year/planner" element={<Planner />} />
           <Route path="calendar/:year/planner/:id" element={<Activities />} />
+          <Route path="template" element={<Template />} />
+          <Route path="template/:id" element={<TemplateActivities />} />
         </Route>
       </Routes>
     </BrowserRouter>

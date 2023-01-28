@@ -1,9 +1,9 @@
 ###
-POST http://localhost:5000/calendar
+POST http://localhost:5000/api/calendar
 Content-Type: application/json
 
 {
-    "year" : 2024,
+    "year" : "sjf",
     "holidays" : [{"Pongal" : "15/01/24"},{"Deepavali":"15/09/24"}]
 }
 

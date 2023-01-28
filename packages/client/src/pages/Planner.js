@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { IoAddCircle } from "react-icons/io5";
 import { useParams } from "react-router-dom";
+import Modal from "../components/Modal";
 import PlannerTile from "../components/PlannerTile";
 import Api from "../utils/Api";
 import {
@@ -20,7 +21,7 @@ const Planner = () => {
   };
 
   const createPlanner = async (name) => {
-    if (createName) {
+    if (name) {
       return await Api.post(PLANNER_ALL_CREATE.replace(":year", year), {
         name,
         start_date: new Date().toISOString(),
@@ -47,6 +48,8 @@ const Planner = () => {
           },
         ],
       });
+    } else {
+      throw "Error";
     }
   };
 
@@ -94,50 +97,42 @@ const Planner = () => {
         ))}
       </div>
       {showModal && (
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
+        <Modal
+          onClose={() => {
             setShowModal(false);
           }}
-          className="absolute left-0 top-0 w-full h-full z-10 bg-secondary/20 grid place-items-center"
         >
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
+          <h1 className="text-primary text-3xl mb-4">Name</h1>
+          <input
+            onChange={(e) => {
+              setCreateName(e.target.value);
             }}
-            className=" bg-white rounded-lg shadow-lg flex flex-col justify-center p-10"
-          >
-            <h1 className="text-primary text-3xl mb-4">Name</h1>
-            <input
-              onChange={(e) => {
-                setCreateName(e.target.value);
-              }}
-              type="text"
-              value={createName}
-              className="text-2xl underline text-secondary border border-primary rounded-md px-2 py-2 mb-2"
-            />
-            <p className="text-red-600 mb-4">{createErrors}</p>
-            <div className="flex flex-row justify-center">
-              <button
-                onClick={async (e) => {
-                  try {
+            type="text"
+            value={createName}
+            className="text-2xl underline text-secondary border border-primary rounded-md px-2 py-2 mb-2"
+          />
+          <p className="text-red-600 mb-4">{createErrors}</p>
+          <div className="flex flex-row justify-center">
+            <button
+              onClick={async (e) => {
+                try {
+                  setCreateErrors("");
+                  await createPlanner(createName);
+                  setShowModal(false);
+                  setCreateName("");
+                } catch (e) {
+                  setCreateErrors("please check name");
+                  setTimeout(() => {
                     setCreateErrors("");
-                    await createPlanner(createName);
-                    setShowModal(false);
-                  } catch (e) {
-                    setCreateErrors("please check name");
-                    setTimeout(() => {
-                      setCreateErrors("");
-                    }, 1500);
-                  }
-                }}
-                className="bg-primary px-4 py-2 rounded-md text-white"
-              >
-                Create
-              </button>
-            </div>
+                  }, 1500);
+                }
+              }}
+              className="bg-primary px-4 py-2 rounded-md text-white"
+            >
+              Create
+            </button>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

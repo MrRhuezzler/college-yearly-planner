@@ -1,5 +1,7 @@
 const router = require("express").Router();
+const { body } = require("express-validator");
 const prisma = require("../utils/dbClient");
+const validateRequest = require("../utils/validateRequest");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -30,16 +32,26 @@ router.get("/:year", async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
-  try {
-    const yrCal = await prisma.calendar.create({
-      data: req.body,
-    });
-    res.send(yrCal);
-  } catch (error) {
-    next(error);
+router.post(
+  "/",
+  validateRequest([
+    body("year").isNumeric().withMessage("Year must be a valid number"),
+    body("holidays").isArray().withMessage("Holidays must be an array"),
+  ]),
+  async (req, res, next) => {
+    try {
+      const yrCal = await prisma.calendar.create({
+        data: req.body,
+      });
+      res.send(yrCal);
+    } catch (error) {
+      next({
+        status: 400,
+        message: `${req.body.year} calendar already exists`,
+      });
+    }
   }
-});
+);
 
 router.delete("/:year", async (req, res, next) => {
   try {
@@ -69,6 +81,5 @@ router.patch("/:year", async (req, res, next) => {
     next(error);
   }
 });
-
 
 module.exports = router;

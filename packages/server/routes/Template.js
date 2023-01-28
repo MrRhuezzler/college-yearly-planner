@@ -1,6 +1,15 @@
 const router = require("express").Router();
 const prisma = require("../utils/dbClient");
 
+router.get("/", async (req, res, next) => {
+  try {
+    const templates = await prisma.template.findMany();
+    res.send(templates);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {

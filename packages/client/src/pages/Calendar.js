@@ -1,27 +1,45 @@
 import CalendarTile from "../components/CalendarTile";
 import { IoAddCircle } from "react-icons/io5";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Api from "../utils/Api";
 import { CALENDAR_ALL_CREATE } from "../utils/Endpoints";
+import Modal from "../components/Modal";
+import { NumberField, Submit } from "../components/form";
+import FormProvider from "../context/FormContext";
 
 const Calendar = () => {
   const [showModal, setShowModal] = useState(false);
-  const [createYear, setCreateYear] = useState(new Date().getFullYear());
-  const [createErrors, setCreateErrors] = useState("");
-
   const [calendars, setCalendars] = useState([]);
+
+  const initialFormData = {
+    body: {
+      year: {
+        value: new Date().getFullYear(),
+        error: "",
+      },
+    },
+    errors: [],
+  };
+
+  const [formData, setFormData] = useState({ ...initialFormData });
 
   const getAllCalendars = async () => {
     const result = await Api.get(CALENDAR_ALL_CREATE);
     return result.data;
   };
 
-  const createCalendar = async (year) => {
-    if (createYear) {
-      return await Api.post(CALENDAR_ALL_CREATE, {
-        year: parseInt(year),
+  const createCalendar = async (body) => {
+    try {
+      const result = await Api.post(CALENDAR_ALL_CREATE, {
+        ...body,
         holidays: [],
       });
+      setFormData({ ...initialFormData });
+      setShowModal(false);
+      return null;
+    } catch (err) {
+      const errors = err.response.data.errors;
+      return errors;
     }
   };
 
@@ -59,51 +77,25 @@ const Calendar = () => {
           ))}
         </div>
         {showModal && (
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
+          <Modal
+            onClose={() => {
               setShowModal(false);
             }}
-            className="absolute left-0 top-0 w-full h-full z-10 bg-secondary/20 grid place-items-center"
           >
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              className=" bg-white rounded-lg shadow-lg flex flex-col justify-center p-10"
+            <FormProvider
+              formData={formData}
+              setFormData={setFormData}
+              onSubmit={createCalendar}
             >
-              <h1 className="text-primary text-3xl mb-4">Year</h1>
-              <input
-                onChange={(e) => {
-                  setCreateYear(e.target.value);
-                }}
-                type="number"
-                value={createYear}
-                s
-                className="text-2xl underline text-secondary border border-primary rounded-md px-2 py-2 mb-2"
-              />
-              <p className="text-red-600 mb-4">{createErrors}</p>
-              <div className="flex flex-row justify-center">
-                <button
-                  onClick={async (e) => {
-                    try {
-                      setCreateErrors("");
-                      await createCalendar(createYear);
-                      setShowModal(false);
-                    } catch (e) {
-                      setCreateErrors("please check year");
-                      setTimeout(() => {
-                        setCreateErrors("");
-                      }, 1500);
-                    }
-                  }}
-                  className="bg-primary px-4 py-2 rounded-md text-white"
-                >
-                  Create
-                </button>
+              <NumberField label="Year" name="year" />
+              <div className="text-sm text-red-500 my-4">
+                {formData.errors.map((msg, index) => {
+                  return <p key={index}>*{msg}</p>;
+                })}
               </div>
-            </div>
-          </div>
+              <Submit label="Create" />
+            </FormProvider>
+          </Modal>
         )}
       </div>
     </>
