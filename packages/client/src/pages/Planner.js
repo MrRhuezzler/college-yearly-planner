@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { IoAddCircle } from "react-icons/io5";
 import { useParams } from "react-router-dom";
+import { DateTimeField, Submit, TextField } from "../components/form";
 import Modal from "../components/Modal";
 import PlannerTile from "../components/PlannerTile";
+import FormProvider from "../context/FormContext";
 import Api from "../utils/Api";
 import {
   PLANNER_ALL_CREATE,
@@ -12,44 +14,42 @@ import {
 const Planner = () => {
   let { year } = useParams();
   const [showModal, setShowModal] = useState(false);
-  const [createName, setCreateName] = useState("");
-  const [createErrors, setCreateErrors] = useState("");
+
+  const initialCreateFormData = {
+    body: {
+      name: {
+        value: "",
+        error: "",
+      },
+      startDate: {
+        value: new Date().toISOString(),
+        error: "",
+      },
+    },
+    errors: [],
+  };
+
+  const [createFormData, setCreateFormData] = useState({
+    ...initialCreateFormData,
+  });
 
   const getAllPlanners = async () => {
     const result = await Api.get(PLANNER_ALL_CREATE.replace(":year", year));
     return result.data;
   };
 
-  const createPlanner = async (name) => {
-    if (name) {
-      return await Api.post(PLANNER_ALL_CREATE.replace(":year", year), {
-        name,
-        start_date: new Date().toISOString(),
-        activities: [
-          {
-            name: "Date of Commencement of Classes",
-            type: "RELATIVE",
-            value: 0,
-          },
-          {
-            name: "CA Test 1 - Date of Commencement",
-            type: "RELATIVE",
-            value: 56,
-          },
-          {
-            name: "CA Test 1 - Last Date of Mark Entry",
-            type: "RELATIVE",
-            value: 3,
-          },
-          {
-            name: "CA Test 2 - Date of Commencement",
-            type: "RELATIVE",
-            value: 56,
-          },
-        ],
+  const createPlanner = async (body) => {
+    try {
+      console.log(body);
+      const result = await Api.post(PLANNER_ALL_CREATE.replace(":year", year), {
+        ...body,
+        activities: [],
       });
-    } else {
-      throw "Error";
+      setShowModal(false);
+      return null;
+    } catch (err) {
+      const errors = err.response.data.errors;
+      return errors;
     }
   };
 
@@ -102,36 +102,21 @@ const Planner = () => {
             setShowModal(false);
           }}
         >
-          <h1 className="text-primary text-3xl mb-4">Name</h1>
-          <input
-            onChange={(e) => {
-              setCreateName(e.target.value);
-            }}
-            type="text"
-            value={createName}
-            className="text-2xl underline text-secondary border border-primary rounded-md px-2 py-2 mb-2"
-          />
-          <p className="text-red-600 mb-4">{createErrors}</p>
-          <div className="flex flex-row justify-center">
-            <button
-              onClick={async (e) => {
-                try {
-                  setCreateErrors("");
-                  await createPlanner(createName);
-                  setShowModal(false);
-                  setCreateName("");
-                } catch (e) {
-                  setCreateErrors("please check name");
-                  setTimeout(() => {
-                    setCreateErrors("");
-                  }, 1500);
-                }
-              }}
-              className="bg-primary px-4 py-2 rounded-md text-white"
-            >
-              Create
-            </button>
-          </div>
+          <FormProvider
+            initialData={initialCreateFormData}
+            formData={createFormData}
+            setFormData={setCreateFormData}
+            onSubmit={createPlanner}
+          >
+            <TextField label="Name" name="name" />
+            <DateTimeField label="Start Date" name="startDate" />
+            <div className="text-sm text-red-500 my-4">
+              {createFormData.errors.map((msg, index) => {
+                return <p key={index}>*{msg}</p>;
+              })}
+            </div>
+            <Submit label="Create" />
+          </FormProvider>
         </Modal>
       )}
     </div>

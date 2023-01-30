@@ -8,6 +8,9 @@ import Api from "../utils/Api";
 import { PLANNER_ONE_UPDATE_DELETE } from "../utils/Endpoints";
 import { IoAddCircle } from "react-icons/io5";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import Modal from "../components/Modal";
+import FormProvider from "../context/FormContext";
+import { DateTimeField, Submit, TextField } from "../components/form";
 
 const Activities = () => {
   let { year, id } = useParams();
@@ -15,8 +18,32 @@ const Activities = () => {
   const [name, setName] = useState("");
   const [activities, setActivities] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
-  const [editMode, setEditMode] = useState(false);
-  const [createErrors, setCreateErrors] = useState("");
+
+  const [showModal, setShowModal] = useState(false);
+
+  const buildInitialUpdateFormData = (name, startDate) => {
+    return {
+      body: {
+        name: {
+          value: name,
+          error: "",
+        },
+        startDate: {
+          value: startDate.toISOString(),
+          error: "",
+        },
+      },
+      errors: [],
+    };
+  };
+
+  const [updateFormData, setUpdateFormData] = useState({
+    ...buildInitialUpdateFormData(name, startDate),
+  });
+
+  useEffect(() => {
+    setUpdateFormData(buildInitialUpdateFormData(name, startDate));
+  }, [name, startDate]);
 
   const fetchPlanner = async () => {
     const result = await Api.get(
@@ -25,41 +52,26 @@ const Activities = () => {
     const data = result.data;
     setName(data.name);
     setActivities(data.activities);
-    setStartDate(new Date(data.start_date));
+    setStartDate(new Date(data.startDate));
   };
 
-  const checkValid = () => {
-    if (!name || !activities || activities.length < 0 || !startDate)
-      return false;
-    return true;
-  };
-
-  const updatePlanner = async () => {
-    if (checkValid()) {
-      const result = await Api.patch(
+  const updatePlanner = async (body) => {
+    try {
+      console.log(body);
+      const result = await Api.put(
         PLANNER_ONE_UPDATE_DELETE.replace(":year", year).replace(":id", id),
-        {
-          name,
-          activities,
-          start_date: startDate.toISOString(),
-        }
+        { ...body }
       );
+      setShowModal(false);
+      return null;
+    } catch (err) {
+      return err.response.data.errors;
     }
   };
 
   useEffect(() => {
     fetchPlanner();
-  }, []);
-
-  // useEffect(() => {
-  //   if (!editMode) {
-  //     updatePlanner();
-  //   }
-  // }, [editMode]);
-
-  useEffect(() => {
-    updatePlanner();
-  }, [activities]);
+  }, [showModal]);
 
   return (
     <div className="p-6">
@@ -69,7 +81,12 @@ const Activities = () => {
             <h1 className="text-3xl font-semibold text-primary">
               <span className="text-secondary">{year}</span> Calendar
             </h1>
-            <button className="text-2xl text-secondary">
+            <button
+              onClick={(e) => {
+                setShowModal(true);
+              }}
+              className="text-2xl text-secondary"
+            >
               <AiOutlineEdit />
             </button>
           </div>
@@ -113,6 +130,29 @@ const Activities = () => {
           ))}
         </ActivitiesProvider>
       </div>
+      {showModal && (
+        <Modal
+          onClose={() => {
+            setShowModal(false);
+          }}
+        >
+          <FormProvider
+            initialData={buildInitialUpdateFormData(name, startDate)}
+            formData={updateFormData}
+            setFormData={setUpdateFormData}
+            onSubmit={updatePlanner}
+          >
+            <TextField label="Name" name="name" />
+            <DateTimeField label="Start Date" name="startDate" />
+            <div className="text-sm text-red-500 my-4">
+              {updateFormData.errors.map((msg, index) => {
+                return <p key={index}>*{msg}</p>;
+              })}
+            </div>
+            <Submit label="Update" />
+          </FormProvider>
+        </Modal>
+      )}
     </div>
   );
 };

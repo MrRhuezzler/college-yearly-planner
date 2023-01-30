@@ -27,6 +27,7 @@ Content-Type: application/json
 
 {
     "name" : "CA 2-Group",
-    "start_date" : "2022-10-31T09:00:00Z",
+    "startDate" : "2022-10-31T09:00:00Z",
+    "templateId"
     "calendarYear" : 2023
 }

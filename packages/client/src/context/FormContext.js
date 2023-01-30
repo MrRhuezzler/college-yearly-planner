@@ -14,18 +14,24 @@ export const useForm = () => useContext(FormContext);
 }
 */
 
-const FormProvider = ({ formData, setFormData, onSubmit, children }) => {
+const FormProvider = ({
+  initialData,
+  formData,
+  setFormData,
+  onSubmit,
+  children,
+}) => {
   // const [formData, setFormData] = formState;
 
   const updateFormData = (name, updatedValue) => {
-    if (updatedValue) {
-      const newFormData = { ...formData };
-      newFormData["body"][name] = {
-        ...formData["body"][name],
-        value: updatedValue,
-      };
-      setFormData(newFormData);
-    }
+    // if (updatedValue) {
+    const newFormData = { ...formData };
+    newFormData["body"][name] = {
+      ...formData["body"][name],
+      value: updatedValue,
+    };
+    setFormData(newFormData);
+    // }
   };
 
   const formatErrors = (errors) => {
@@ -77,6 +83,8 @@ const FormProvider = ({ formData, setFormData, onSubmit, children }) => {
       }
       formatErrors(formattedErrors.body);
       setFormData({ ...formData, errors: formattedErrors.global });
+    } else {
+      setFormData({ ...initialData });
     }
   };
 

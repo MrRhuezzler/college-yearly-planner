@@ -11,17 +11,21 @@ const Calendar = () => {
   const [showModal, setShowModal] = useState(false);
   const [calendars, setCalendars] = useState([]);
 
-  const initialFormData = {
-    body: {
-      year: {
-        value: new Date().getFullYear(),
-        error: "",
+  const buildInitialCreateFormData = (year) => {
+    return {
+      body: {
+        year: {
+          value: new Date().getFullYear(),
+          error: "",
+        },
       },
-    },
-    errors: [],
+      errors: [],
+    };
   };
 
-  const [formData, setFormData] = useState({ ...initialFormData });
+  const [createFormData, setCreateFormData] = useState(
+    buildInitialCreateFormData(new Date().getFullYear())
+  );
 
   const getAllCalendars = async () => {
     const result = await Api.get(CALENDAR_ALL_CREATE);
@@ -34,7 +38,6 @@ const Calendar = () => {
         ...body,
         holidays: [],
       });
-      setFormData({ ...initialFormData });
       setShowModal(false);
       return null;
     } catch (err) {
@@ -47,6 +50,7 @@ const Calendar = () => {
     (async () => {
       const data = await getAllCalendars();
       setCalendars(data);
+      setCreateFormData(buildInitialCreateFormData(new Date().getFullYear()));
     })();
   }, [showModal]);
 
@@ -83,13 +87,14 @@ const Calendar = () => {
             }}
           >
             <FormProvider
-              formData={formData}
-              setFormData={setFormData}
+              initialData={buildInitialCreateFormData(new Date().getFullYear())}
+              formData={createFormData}
+              setFormData={setCreateFormData}
               onSubmit={createCalendar}
             >
               <NumberField label="Year" name="year" />
               <div className="text-sm text-red-500 my-4">
-                {formData.errors.map((msg, index) => {
+                {createFormData.errors.map((msg, index) => {
                   return <p key={index}>*{msg}</p>;
                 })}
               </div>
