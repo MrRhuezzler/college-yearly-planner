@@ -31,3 +31,11 @@ Content-Type: application/json
     "templateId"
     "calendarYear" : 2023
 }
+###
+POST http://localhost:5000/api/calendar/2023/planner/1/addWorkingDays
+Content-Type: application/json
+
+{
+    "days" : 85,
+    "startDate" : "2022-07-11T00:00:00Z"
+}

@@ -14,6 +14,7 @@ app.use(morgan("dev"));
 
 app.use("/api/calendar", require("./routes/Calendar"));
 app.use("/api/calendar", require("./routes/Planner"));
+app.use("/api/calendar", require("./routes/Activity"));
 app.use("/api/template", require("./routes/Template"));
 
 // app.get("*", async (req, res, next) => {

@@ -3,7 +3,9 @@ const { body } = require("express-validator");
 const prisma = require("../utils/dbClient");
 const validateRequest = require("../utils/validateRequest");
 
-router.get("/:year/planner", async (req, res, next) => {
+const baseURL = "/:year/planner";
+
+router.get(baseURL, async (req, res, next) => {
   try {
     const plans = await prisma.planner.findMany({ orderBy: { id: "desc" } });
     res.send(plans);
@@ -12,7 +14,7 @@ router.get("/:year/planner", async (req, res, next) => {
   }
 });
 
-router.get("/:year/planner/:id", async (req, res, next) => {
+router.get(baseURL + "/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
     const plannerobj = await prisma.planner.findUnique({
@@ -27,7 +29,7 @@ router.get("/:year/planner/:id", async (req, res, next) => {
 });
 
 router.post(
-  "/:year/planner",
+  baseURL,
   validateRequest([
     body("startDate")
       .exists()
@@ -60,7 +62,7 @@ router.post(
   }
 );
 
-router.delete("/:year/planner/:id", async (req, res, next) => {
+router.delete(baseURL + "/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
     const plannerobj = await prisma.planner.delete({
@@ -75,7 +77,7 @@ router.delete("/:year/planner/:id", async (req, res, next) => {
 });
 
 router.put(
-  "/:year/planner/:id",
+  baseURL + "/:id",
   validateRequest([
     body("startDate")
       .exists()
@@ -104,19 +106,25 @@ router.put(
   }
 );
 
-router.patch("/:year/planner/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const plannerobj = await prisma.planner.update({
-      where: {
-        id: Number(id),
-      },
-      data: req.body,
-    });
-    res.send(plannerobj);
-  } catch (error) {
-    next(error);
+router.patch(
+  baseURL + "/:id",
+  validateRequest([
+    body("activities").isArray().withMessage("Acitivites must be an array"),
+  ]),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const plannerobj = await prisma.planner.update({
+        where: {
+          id: Number(id),
+        },
+        data: req.body,
+      });
+      res.send(plannerobj);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 module.exports = router;

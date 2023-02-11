@@ -99,36 +99,36 @@ const Activities = () => {
           <h2 className="text-2xl text-primary">{startDate.toDateString()}</h2>
         </div>
       </div>
-      <div className="px-10 lg:px-20 space-y-4">
-        <div className="w-full flex flex-row py-5 px-4 transition-all border-b-4 border-b-secondary border-t-4 border-t-secondary">
-          <p className="flex-1 text-center">Name</p>
-          <p className="flex-1 text-center">Type</p>
-          <p className="flex-1 text-center">Value</p>
-          <p className="flex-1 text-center">Calculated Date</p>
+      <div className="flex flex-row">
+        <div className="w-[80%]">
+          <ActivitiesProvider
+            value={activities}
+            setValue={setActivities}
+            start_date={startDate}
+          >
+            {activities.map((activity, index) => (
+              <Draggable
+                key={index}
+                draggableId={`activity-${index}`}
+                index={index}
+              >
+                {(provided) => (
+                  <div
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                  >
+                    <ActivityTile index={index} {...activity} />
+                  </div>
+                )}
+              </Draggable>
+            ))}
+          </ActivitiesProvider>
+          {/* <ActivityTile today={true} />
+          <ActivityTile />
+          <ActivityTile /> */}
         </div>
-        <ActivitiesProvider
-          value={activities}
-          setValue={setActivities}
-          start_date={startDate}
-        >
-          {activities.map((activity, index) => (
-            <Draggable
-              key={`activity-${index}`}
-              draggableId={`activity-${index}`}
-              index={index}
-            >
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                >
-                  <ActivityTile index={index} {...activity} />
-                </div>
-              )}
-            </Draggable>
-          ))}
-        </ActivitiesProvider>
+        <div className="flex-1"></div>
       </div>
       {showModal && (
         <Modal
@@ -144,11 +144,13 @@ const Activities = () => {
           >
             <TextField label="Name" name="name" />
             <DateTimeField label="Start Date" name="startDate" />
-            <div className="text-sm text-red-500 my-4">
-              {updateFormData.errors.map((msg, index) => {
-                return <p key={index}>*{msg}</p>;
-              })}
-            </div>
+            {updateFormData.errors && updateFormData.errors.length > 0 && (
+              <div className="text-sm text-red-500 my-4">
+                {updateFormData.errors.map((msg, index) => {
+                  return <p key={index}>*{msg}</p>;
+                })}
+              </div>
+            )}
             <Submit label="Update" />
           </FormProvider>
         </Modal>

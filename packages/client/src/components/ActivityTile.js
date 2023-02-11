@@ -1,141 +1,138 @@
-import { useEffect, useState } from "react";
-import { AiFillCheckCircle } from "react-icons/ai";
-import { useActivity } from "../context/ActivityContext";
+import { useEffect } from "react";
+import { useState } from "react";
 import DatePicker from "react-date-picker";
-import { MdDelete } from "react-icons/md";
+import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
+import { useActivity } from "../context/ActivityContext";
+import FormProvider from "../context/FormContext";
+import { DateTimeField, Submit, TextField, ToggleField } from "./form";
+import Modal from "./Modal";
 
-const ActivityTile = ({ index, name: n, type: t, value: v }) => {
-  const [editMode, setEditMode] = useState(false);
+const ActivityTile = ({
+  name: n,
+  type: t,
+  value: v,
+  calculated_date,
+  index,
+  today,
+}) => {
+  const { handleActivityAction } = useActivity();
+
   const [name, setName] = useState(n);
+  const [value, setValue] = useState(v);
   const [type, setType] = useState(t);
-  const typePossibilities = ["RELATIVE", "ABSOLUTE"];
-  const [value, setValue] = useState(v ? v : 0);
-  const [preValue, setPreValue] = useState(v ? v : 0);
 
-  // const { onDragStart, onDragEnter, onDragEnd } = dragFunc;
-
-  const { handleActivityAction, calculatedDates } = useActivity();
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    if (!editMode) {
-      handleActivityAction({
-        type: "UPDATE",
-        index,
-        data: { name, type, value },
-      });
-    }
-    // console.log(calculatedDates);
-  }, [editMode, value]);
+    handleActivityAction({
+      type: "UPDATE",
+      index,
+      data: { name, value, type },
+    });
+  }, [editMode]);
 
   return (
-    <div className="w-full flex flex-row outline items-center outline-primary rounded-lg py-5 px-4 transition-all mb-4">
-      <button
-        onClick={(e) => {
-          handleActivityAction({ type: "DELETE", index });
-        }}
-        className="text-secondary text-xl"
-      >
-        <MdDelete />
-      </button>
-      <div className="flex-1 grid place-items-center">
-        {editMode ? (
-          <div className="flex flex-row justify-center space-x-4 mb-2">
+    <div className="my-4 bg-gray-100">
+      {today && <p>today</p>}
+      <div className="flex flex-row justify-between items-center py-6 px-6 text-xl outline outline-1 outline-primary rounded-lg">
+        <div>
+          <p className="ml-[-5px] text-gray-400 text-base mb-2">Name</p>
+          {editMode ? (
             <input
               type="text"
-              style={{ width: `${name.length}ch` }}
-              className={`text-xl bg-gray-100 text-primary underline focus:outline-none max-w-sm`}
+              className={`bg-gray-100 outline rounded-sm px-2 py-1`}
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
               }}
             />
-            <button
-              onClick={(e) => {
-                setEditMode(!editMode);
-              }}
-            >
-              <AiFillCheckCircle className="text-2xl text-secondary"></AiFillCheckCircle>
-            </button>
-          </div>
-        ) : (
-          <h2
-            onClick={(e) => {
-              setEditMode(!editMode);
-            }}
-            className="text-xl text-center text-primary hover:cursor-pointer"
-          >
-            {name}
-          </h2>
-        )}
-      </div>
-      <div className="flex-1 grid place-items-center">
-        {editMode ? (
-          <div className="flex flex-row justify-center space-x-4 mb-2">
+          ) : (
+            <p>{name}</p>
+          )}
+        </div>
+        <div>
+          <p className="ml-[-5px] text-gray-400 text-base mb-2">Type</p>
+          {editMode ? (
             <select
+              className={`bg-gray-100 outline rounded-sm px-2 py-1`}
+              value={type}
               onChange={(e) => {
-                if (e.target.value === "ABSOLUTE") {
-                  setPreValue(value);
-                  setValue(new Date());
-                } else {
-                  setValue(preValue);
-                }
                 setType(e.target.value);
               }}
-              className="bg-gray-100 px-4 py-2 text-lg text-primary"
             >
-              {typePossibilities.map((v) => (
-                <option selected={v === type}>{v}</option>
-              ))}
+              <option value="RELATIVE">RELATIVE</option>
+              <option value="ABSOLUTE">ABSOLUTE</option>
             </select>
-            <button
-              onClick={(e) => {
-                setEditMode(!editMode);
-              }}
-            >
-              <AiFillCheckCircle className="text-2xl text-secondary"></AiFillCheckCircle>
-            </button>
-          </div>
-        ) : (
-          <h2
+          ) : (
+            <p>{type}</p>
+          )}
+        </div>
+        <div>
+          <p className="ml-[-5px] text-gray-400 text-base">Value</p>
+          {type === "RELATIVE" ? (
+            <>
+              {editMode ? (
+                <input
+                  type="number"
+                  className={`bg-gray-100 outline rounded-sm px-2 py-1`}
+                  value={value}
+                  onChange={(e) => {
+                    setValue(e.target.value);
+                  }}
+                />
+              ) : (
+                <p>{value}</p>
+              )}
+            </>
+          ) : (
+            <>
+              {editMode ? (
+                <DatePicker
+                  value={
+                    value
+                      ? !isNaN(new Date(value))
+                        ? new Date(value)
+                        : null
+                      : value
+                  }
+                  onChange={(v) => {
+                    if (!v) {
+                      setValue(v);
+                    } else {
+                      setValue(v.toISOString());
+                    }
+                  }}
+                />
+              ) : (
+                <p>{value}</p>
+              )}
+            </>
+          )}
+        </div>
+        <div>
+          <p className="ml-[-5px] text-gray-400 text-base">Final Date</p>
+          <p>{calculated_date}</p>
+        </div>
+        <div className="space-x-6 text-2xl">
+          <button
             onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setEditMode(!editMode);
             }}
-            className="text-lg text-center text-primary hover:cursor-pointer"
           >
-            {type}
-          </h2>
-        )}
-      </div>
-      <div className="flex-1 grid place-items-center">
-        {type === "RELATIVE" ? (
-          <input
-            className="bg-gray-100"
-            style={{ width: `${value.toString().length + 3}ch` }}
-            type="number"
-            value={value}
-            onChange={(e) => {
-              setValue(parseInt(e.target.value));
+            <AiOutlineEdit />
+          </button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleActivityAction({ type: "DELETE", index });
             }}
-          />
-        ) : (
-          <DatePicker
-            value={value}
-            onChange={setValue}
-            className="bg-gray-100"
-          />
-          // <input
-          //   className="bg-gray-100"
-          //   type="date"
-          //   value={value}
-          //   onChange={(e) => {
-          //     setValue(new Date(e.target.value));
-          //   }}
-          // />
-        )}
-      </div>
-      <div className="flex-1 grid place-items-center">
-        {calculatedDates.length > 0 &&
-          new Date(calculatedDates[index]).toDateString()}
+          >
+            <AiOutlineDelete />
+          </button>
+        </div>
       </div>
     </div>
   );

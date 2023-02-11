@@ -93,11 +93,13 @@ const Calendar = () => {
               onSubmit={createCalendar}
             >
               <NumberField label="Year" name="year" />
-              <div className="text-sm text-red-500 my-4">
-                {createFormData.errors.map((msg, index) => {
-                  return <p key={index}>*{msg}</p>;
-                })}
-              </div>
+              {createFormData.errors && createFormData.errors.length > 0 && (
+                <div className="text-sm text-red-500 my-4">
+                  {createFormData.errors.map((msg, index) => {
+                    return <p key={index}>*{msg}</p>;
+                  })}
+                </div>
+              )}
               <Submit label="Create" />
             </FormProvider>
           </Modal>
