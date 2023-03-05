@@ -68,28 +68,40 @@ const ActivitiesProvider = ({ value, setValue, children }) => {
         <DragDropContext onDragEnd={handleReorder}>
           <Droppable droppableId="activities">
             {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
+              <tbody
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="text-center"
+              >
                 {children}
                 {provided.placeholder}
-              </div>
+                <tr className="border-b-2 border-x-2 border-primary">
+                  <td colspan="4" className="py-2 bg-primary/30">
+                    <div className="flex justify-center items-center text-2xl">
+                      <button
+                        onClick={(e) => {
+                          handleActivityAction({
+                            type: "CREATE",
+                            data: {
+                              name: `New Activity ${value.length}`,
+                              type: "RELATIVE",
+                              value: 0,
+                            },
+                          });
+                        }}
+                        className="text-primary hover:text-secondary"
+                      >
+                        <IoAddCircle></IoAddCircle>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
             )}
           </Droppable>
         </DragDropContext>
-        <div className="w-full flex flex-row justify-center">
-          <button
-            onClick={(e) => {
-              handleActivityAction({
-                type: "CREATE",
-                data: {
-                  name: "New Activity " + value.length,
-                  type: "RELATIVE",
-                  value: 0,
-                },
-              });
-            }}
-          >
-            <IoAddCircle className="text-primary hover:text-secondary text-4xl"></IoAddCircle>
-          </button>
+        <div className="my-4">
+          yes
         </div>
       </ActivityContext.Provider>
     </>

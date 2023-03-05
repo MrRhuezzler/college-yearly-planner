@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const prisma = require("../utils/dbClient");
 const validateRequest = require("../utils/validateRequest");
 
@@ -17,20 +17,26 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/:year", async (req, res, next) => {
-  try {
-    const { year } = req.params;
-    const yrCal = await prisma.calendar.findUnique({
-      where: {
-        year: Number(year),
-      },
-      include: { Planner: true },
-    });
-    res.send(yrCal);
-  } catch (error) {
-    next(error);
+router.get(
+  "/:year",
+  validateRequest([
+    param("year").isNumeric().withMessage("Year must be a valid number"),
+  ]),
+  async (req, res, next) => {
+    try {
+      const { year } = req.params;
+      const yrCal = await prisma.calendar.findUnique({
+        where: {
+          year: Number(year),
+        },
+        include: { Planner: true },
+      });
+      res.send(yrCal);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.post(
   "/",
@@ -53,33 +59,46 @@ router.post(
   }
 );
 
-router.delete("/:year", async (req, res, next) => {
-  try {
-    const { year } = req.params;
-    const yrCal = await prisma.calendar.delete({
-      where: {
-        year: Number(year),
-      },
-    });
-    res.send(yrCal);
-  } catch (error) {
-    next(error);
+router.delete(
+  "/:year",
+  validateRequest([
+    param("year").isNumeric().withMessage("Year must be a valid number"),
+  ]),
+  async (req, res, next) => {
+    try {
+      const { year } = req.params;
+      const yrCal = await prisma.calendar.delete({
+        where: {
+          year: Number(year),
+        },
+      });
+      res.send(yrCal);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-router.patch("/:year", async (req, res, next) => {
-  try {
-    const { year } = req.params;
-    const yrCal = await prisma.calendar.update({
-      where: {
-        year: Number(year),
-      },
-      data: req.body,
-    });
-    res.send(yrCal);
-  } catch (error) {
-    next(error);
+router.put(
+  "/:year",
+  validateRequest([
+    param("year").isNumeric().withMessage("Year must be a valid number"),
+    body("holidays").isArray().withMessage("Holidays must be an array"),
+  ]),
+  async (req, res, next) => {
+    try {
+      const { year } = req.params;
+      const yrCal = await prisma.calendar.update({
+        where: {
+          year: Number(year),
+        },
+        data: req.body,
+      });
+      res.send(yrCal);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 module.exports = router;

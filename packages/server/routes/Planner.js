@@ -1,36 +1,50 @@
 const router = require("express").Router();
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const prisma = require("../utils/dbClient");
 const validateRequest = require("../utils/validateRequest");
 
 const baseURL = "/:year/planner";
 
-router.get(baseURL, async (req, res, next) => {
-  try {
-    const plans = await prisma.planner.findMany({ orderBy: { id: "desc" } });
-    res.send(plans);
-  } catch (error) {
-    next(error);
+router.get(
+  baseURL,
+  validateRequest([
+    param("year").isNumeric().withMessage("Year must be a valid number"),
+  ]),
+  async (req, res, next) => {
+    const { year } = req.params;
+    try {
+      const plans = await prisma.planner.findMany({ orderBy: { id: "desc" } });
+      res.send(plans);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-router.get(baseURL + "/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const plannerobj = await prisma.planner.findUnique({
-      where: {
-        id: Number(id),
-      },
-    });
-    res.send(plannerobj);
-  } catch (error) {
-    next(error);
+router.get(
+  baseURL + "/:id",
+  validateRequest([
+    param("year").isNumeric().withMessage("Year must be a valid number"),
+  ]),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const plannerobj = await prisma.planner.findUnique({
+        where: {
+          id: Number(id),
+        },
+      });
+      res.send(plannerobj);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.post(
   baseURL,
   validateRequest([
+    param("year").isNumeric().withMessage("Year must be a valid number"),
     body("startDate")
       .exists()
       .withMessage("Start Date is missing")
@@ -62,23 +76,30 @@ router.post(
   }
 );
 
-router.delete(baseURL + "/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const plannerobj = await prisma.planner.delete({
-      where: {
-        id: Number(id),
-      },
-    });
-    res.send(plannerobj);
-  } catch (error) {
-    next(error);
+router.delete(
+  baseURL + "/:id",
+  validateRequest([
+    param("year").isNumeric().withMessage("Year must be a valid number"),
+  ]),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const plannerobj = await prisma.planner.delete({
+        where: {
+          id: Number(id),
+        },
+      });
+      res.send(plannerobj);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.put(
   baseURL + "/:id",
   validateRequest([
+    param("year").isNumeric().withMessage("Year must be a valid number"),
     body("startDate")
       .exists()
       .withMessage("Start Date is missing")
@@ -109,6 +130,7 @@ router.put(
 router.patch(
   baseURL + "/:id",
   validateRequest([
+    param("year").isNumeric().withMessage("Year must be a valid number"),
     body("activities").isArray().withMessage("Acitivites must be an array"),
   ]),
   async (req, res, next) => {

@@ -11,6 +11,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Modal from "../components/Modal";
 import FormProvider from "../context/FormContext";
 import { DateTimeField, Submit, TextField } from "../components/form";
+import ActivityEditTile from "../components/ActivityEditTile";
 
 const Activities = () => {
   let { year, id } = useParams();
@@ -20,6 +21,7 @@ const Activities = () => {
   const [startDate, setStartDate] = useState(new Date());
 
   const [showModal, setShowModal] = useState(false);
+  const [showActivitiesModal, setShowActivitiesModal] = useState(false);
 
   const buildInitialUpdateFormData = (name, startDate) => {
     return {
@@ -101,32 +103,74 @@ const Activities = () => {
       </div>
       <div className="flex flex-row">
         <div className="w-[80%]">
-          <ActivitiesProvider
-            value={activities}
-            setValue={setActivities}
-            start_date={startDate}
-          >
-            {activities.map((activity, index) => (
-              <Draggable
-                key={index}
-                draggableId={`activity-${index}`}
-                index={index}
-              >
-                {(provided) => (
-                  <div
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    ref={provided.innerRef}
+          <div className="text-right">
+            <button
+              onClick={(e) => {
+                setShowActivitiesModal(true);
+              }}
+              className="text-2xl text-secondary"
+            >
+              <AiOutlineEdit />
+            </button>
+          </div>
+          <table class="table-fixed w-full">
+            <thead className="bg-secondary text-white border-secondary border-t-2 border-x-2">
+              <tr>
+                <th className="py-3">ACTIVITY NAME</th>
+                <th className="py-3">TYPE</th>
+                <th className="py-3">VALUE</th>
+                <th className="py-3">CALCULATED DATE</th>
+              </tr>
+            </thead>
+            <tbody className="text-center">
+              {activities.map((activity, index) => (
+                <ActivityTile index={index} {...activity} />
+              ))}
+            </tbody>
+          </table>
+          {showActivitiesModal && (
+            <Modal
+              onClose={() => {
+                setShowActivitiesModal(false);
+              }}
+            >
+              <div>
+                <table class="table-fixed">
+                  <thead className="bg-secondary text-white border-secondary border-t-2 border-x-2">
+                    <tr>
+                      <th className="px-6 py-3"></th>
+                      <th className="px-6 py-3">ACTIVITY NAME</th>
+                      <th className="px-6 py-3">TYPE</th>
+                      <th className="px-6 py-3">VALUE</th>
+                    </tr>
+                  </thead>
+                  <ActivitiesProvider
+                    value={activities}
+                    setValue={setActivities}
                   >
-                    <ActivityTile index={index} {...activity} />
-                  </div>
-                )}
-              </Draggable>
-            ))}
-          </ActivitiesProvider>
-          {/* <ActivityTile today={true} />
-          <ActivityTile />
-          <ActivityTile /> */}
+                    {activities.map((activity, index) => (
+                      <Draggable
+                        key={index}
+                        draggableId={`activity-${index}`}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <tr
+                            className="border-2 border-primary"
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            ref={provided.innerRef}
+                          >
+                            <ActivityEditTile index={index} {...activity} />
+                          </tr>
+                        )}
+                      </Draggable>
+                    ))}
+                  </ActivitiesProvider>
+                </table>
+              </div>
+            </Modal>
+          )}
         </div>
         <div className="flex-1"></div>
       </div>
