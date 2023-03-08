@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { IoAddCircle } from "react-icons/io5";
-import { useParams } from "react-router-dom";
-import { DateTimeField, Submit, TextField } from "../components/form";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  DateTimeField,
+  NumberField,
+  Submit,
+  TextField,
+} from "../components/form";
 import Modal from "../components/Modal";
 import PlannerTile from "../components/PlannerTile";
 import FormProvider from "../context/FormContext";
@@ -12,6 +17,7 @@ import {
 } from "../utils/Endpoints";
 
 const Planner = () => {
+  const navigate = useNavigate();
   let { year } = useParams();
   const [showModal, setShowModal] = useState(false);
 
@@ -23,6 +29,10 @@ const Planner = () => {
       },
       startDate: {
         value: new Date().toISOString(),
+        error: "",
+      },
+      totalWorkingDays: {
+        value: 0,
         error: "",
       },
     },
@@ -40,10 +50,9 @@ const Planner = () => {
 
   const createPlanner = async (body) => {
     try {
-      console.log(body);
+      // console.log(body);
       const result = await Api.post(PLANNER_ALL_CREATE.replace(":year", year), {
         ...body,
-        activities: [],
       });
       setShowModal(false);
       return null;
@@ -73,7 +82,12 @@ const Planner = () => {
         </div>
         <div className="flex flex-row space-x-4">
           <div className="flex flex-col justify-center">
-            <button className="group text-2xl transition-all">
+            <button
+              onClick={(e) => {
+                navigate(`/calendar/${year}/holidays`);
+              }}
+              className="group text-2xl transition-all"
+            >
               <p className="text-primary group-hover:text-secondary">
                 Holidays
               </p>
@@ -110,6 +124,7 @@ const Planner = () => {
           >
             <TextField label="Name" name="name" />
             <DateTimeField label="Start Date" name="startDate" />
+            <NumberField label="Total Working days" name="totalWorkingDays" />
             {createFormData.errors && createFormData.errors.length > 0 && (
               <div className="text-sm text-red-500 my-4">
                 {createFormData.errors.map((msg, index) => {

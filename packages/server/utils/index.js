@@ -1,15 +1,13 @@
 const addWeekdaysWithoutHolidays = (holidays, startDate, days) => {
-  console.log(holidays);
-  let currentDate = startDate;
-  console.log(currentDate.toDateString);
+  let currentDate = new Date(startDate);
   let count = 0;
   while (count < days) {
     currentDate.setDate(currentDate.getDate() + 1);
 
     if (
-      holidays.includes(currentDate.toDateString()) ||
-      currentDate.getDay() === 0 ||
-      currentDate.getDay() === 6
+      holidays.includes(currentDate.toLocaleDateString()) ||
+      currentDate.getDay() === 0
+      // currentDate.getDay() === 6
     ) {
       continue;
     }
@@ -17,9 +15,30 @@ const addWeekdaysWithoutHolidays = (holidays, startDate, days) => {
     count++;
   }
 
-  return currentDate;
+  return new Date(currentDate);
+};
+
+const differenceWeekdaysWithHolidays = (holidays, startDate, lastDate) => {
+  let currentDate = new Date(startDate);
+  let count = 0;
+  while (currentDate.toLocaleDateString() !== lastDate.toLocaleDateString()) {
+    currentDate.setDate(currentDate.getDate() + 1);
+
+    if (
+      holidays.includes(currentDate.toLocaleDateString()) ||
+      currentDate.getDay() === 0
+      // currentDate.getDay() === 6
+    ) {
+      continue;
+    }
+
+    count++;
+  }
+
+  return count;
 };
 
 module.exports = {
   addWeekdaysWithoutHolidays,
+  differenceWeekdaysWithHolidays,
 };

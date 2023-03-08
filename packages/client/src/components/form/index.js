@@ -32,7 +32,7 @@ export const NumberField = ({ label, name, onChange }) => {
     <div className="mb-4">
       <h1 className="text-primary text-3xl mb-2">{label}</h1>
       <input
-        type="text"
+        type="number"
         className={`text-2xl underline text-secondary border ${
           error ? "border-red-400" : "border-primary"
         } rounded-md px-2 py-2 mb-2`}
@@ -95,6 +95,8 @@ export const DateTimeField = ({ label, name, onChange }) => {
     <div className="mb-4">
       <h1 className="text-primary text-3xl mb-2">{label}</h1>
       <DatePicker
+        // format="MM-dd-y"
+        // da
         value={
           value ? (!isNaN(new Date(value)) ? new Date(value) : null) : value
         }

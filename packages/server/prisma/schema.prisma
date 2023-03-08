@@ -17,12 +17,31 @@ model Calendar {
 }
 
 model Planner {
-  id           Int      @id @default(autoincrement())
+  id               Int        @id @default(autoincrement())
+  name             String
+  startDate        DateTime
+  lastDate         DateTime
+  totalWorkingDays Int
+  activities       Activity[]
+  calendar         Calendar?  @relation(fields: [calendarYear], references: [year])
+  calendarYear     Int?
+}
+
+enum ActivityType {
+  ABSOLUTE
+  RELATIVE
+}
+
+model Activity {
+  id           Int          @id @default(autoincrement())
   name         String
-  startDate    DateTime
-  activities   Json
-  calendar     Calendar @relation(fields: [calendarYear], references: [year])
-  calendarYear Int
+  type         ActivityType
+  relativeDays Int?
+  relativeDate DateTime?
+  date         DateTime
+  order        Int
+  Planner      Planner?     @relation(fields: [plannerId], references: [id])
+  plannerId    Int?
 }
 
 model Template {
