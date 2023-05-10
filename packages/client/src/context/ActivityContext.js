@@ -94,6 +94,7 @@ const ActivitiesProvider = ({ value, setValue, children }) => {
           .replace(":activity_id", activity_id),
         { ...data }
       );
+      console.log(result.data);
       setValue(result.data);
     } catch (err) {
       const errors = err.response.data.errors;
@@ -132,6 +133,7 @@ const ActivitiesProvider = ({ value, setValue, children }) => {
               <th className="py-3">ACTIVITY NAME</th>
               <th className="py-3">TYPE</th>
               <th className="py-3">DAYS/DATE</th>
+              <th className="py-3">DAYS FROM START</th>
               <th className="py-3">CALCULATED DATE</th>
               <th className="py-3">ACTIONS</th>
               <th className="py-3">DAYS LEFT</th>

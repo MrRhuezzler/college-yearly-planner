@@ -1,6 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { AiOutlineCloudDownload } from "react-icons/ai";
 import { useState } from "react";
+import Api from "../utils/Api";
+import { PLANNER_EXPORT } from "../utils/Endpoints";
 
 const PlannerTile = ({ id, name, activities, start_date }) => {
   const navigate = useNavigate();
@@ -33,6 +35,7 @@ const PlannerTile = ({ id, name, activities, start_date }) => {
           <button
             className="text-4xl"
             onClick={(e) => {
+              window.open(PLANNER_EXPORT.replace(":year", year).replace(":id", id));
               e.stopPropagation();
             }}
           >

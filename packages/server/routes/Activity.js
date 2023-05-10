@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { body, param } = require("express-validator");
-const { addWeekdaysWithoutHolidays } = require("../utils");
+const { addWeekdaysWithoutHolidays, differenceWeekdaysWithHolidays } = require("../utils");
 const prisma = require("../utils/dbClient");
 const validateRequest = require("../utils/validateRequest");
 const { route } = require("./Planner");
@@ -92,6 +92,10 @@ router.post(
         } else {
           startDate = planner.activities[planner.activities.length - 1].date;
         }
+
+        startDate = new Date(startDate);
+        startDate.setHours(0, 0, 0, 0);
+
         const order = planner.activities.length;
 
         // Calculate the date.
@@ -111,7 +115,13 @@ router.post(
           },
         });
 
-        return res.send(activity);
+        const relativeToStart = differenceWeekdaysWithHolidays(
+          (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+          startDate,
+          activity.date,
+        );
+
+        return res.send({ ...activity, relativeToStart });
       } else {
         const planner = await prisma.planner.findUnique({
           where: { id: Number(id) },
@@ -132,7 +142,13 @@ router.post(
           },
         });
 
-        return res.send(activity);
+        const relativeToStart = differenceWeekdaysWithHolidays(
+          (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+          planner.startDate,
+          activity.date,
+        );
+
+        return res.send({ ...activity, relativeToStart });
       }
     } catch (err) {
       next(err);
@@ -246,6 +262,8 @@ router.put(
       });
 
       let startDate = new Date(planner.startDate);
+      startDate.setHours(0, 0, 0, 0);
+
       const holidays = planner.calendar.holidays;
       const acitivites = planner.activities;
 
@@ -285,13 +303,22 @@ router.put(
         })
       );
 
-      // const activity = await prisma.activity.findUnique({
-      //   where: {
-      //     id: activity_id,
-      //   },
-      // });
+      startDate = new Date(planner.startDate);
+      startDate.setHours(0, 0, 0, 0);
 
-      return res.send(updatedActivities);
+      const newActivities = updatedActivities.map((activity) => {
+        const relativeToStart = differenceWeekdaysWithHolidays(
+          (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+          startDate,
+          activity.date,
+        )
+        return {
+          ...activity,
+          relativeToStart
+        }
+      });
+
+      return res.send(newActivities);
     } catch (err) {
       next(err);
     }
@@ -322,6 +349,7 @@ router.post(
       });
 
       let startDate = new Date(planner.startDate);
+      startDate.setHours(0, 0, 0, 0);
       const holidays = planner.calendar.holidays;
       const acitivites = planner.activities;
 
@@ -364,7 +392,20 @@ router.post(
         })
       );
 
-      res.send(updatedActivities);
+      const newActivities = updatedActivities.map((activity) => {
+        const relativeToStart = differenceWeekdaysWithHolidays(
+          (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+          planner.startDate,
+          activity.date,
+        )
+        return {
+          ...activity,
+          relativeToStart
+        }
+      });
+
+
+      res.send(newActivities);
     } catch (err) {
       next(err);
     }
@@ -395,7 +436,7 @@ router.delete(
           id: activity_id,
         },
       });
-      
+
       let planner = await prisma.planner.findUnique({
         where: { id: Number(id) },
         include: { calendar: true, activities: { orderBy: { order: "asc" } } },
@@ -441,7 +482,20 @@ router.delete(
         })
       );
 
-      return res.send(updatedActivities);
+      const newActivities = updatedActivities.map((activity) => {
+        const relativeToStart = differenceWeekdaysWithHolidays(
+          (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+          planner.startDate,
+          activity.date,
+        )
+        return {
+          ...activity,
+          relativeToStart
+        }
+      });
+
+
+      return res.send(newActivities);
     } catch (err) {
       next(err);
     }

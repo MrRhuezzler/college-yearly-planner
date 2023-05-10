@@ -13,6 +13,7 @@ import FormProvider from "../context/FormContext";
 import Api from "../utils/Api";
 import {
   PLANNER_ALL_CREATE,
+  PLANNER_EXPORT_MANY,
   PLANNER_ONE_UPDATE_DELETE,
 } from "../utils/Endpoints";
 
@@ -20,6 +21,7 @@ const Planner = () => {
   const navigate = useNavigate();
   let { year } = useParams();
   const [showModal, setShowModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const initialCreateFormData = {
     body: {
@@ -43,6 +45,10 @@ const Planner = () => {
     ...initialCreateFormData,
   });
 
+  const [planners, setPlanners] = useState([]);
+  const [plannersForExport, setPlannersForExport] = useState([]);
+  const [exportName, setExportName] = useState("");
+
   const getAllPlanners = async () => {
     const result = await Api.get(PLANNER_ALL_CREATE.replace(":year", year));
     return result.data;
@@ -62,7 +68,20 @@ const Planner = () => {
     }
   };
 
-  const [planners, setPlanners] = useState([]);
+  const exportMany = async () => {
+    try {
+      const query = new URLSearchParams({
+        planners: plannersForExport.map((p) => p.id).join(","),
+        name: exportName
+      })
+      window.open(PLANNER_EXPORT_MANY.replace(":year", year) + "?" + query);
+      setExportName("");
+      setPlannersForExport([]);
+      setShowExportModal(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -81,6 +100,18 @@ const Planner = () => {
           <h2 className="text-gray-500">Select a planner</h2>
         </div>
         <div className="flex flex-row space-x-4">
+          <div className="flex flex-col justify-center">
+            <button
+              onClick={(e) => {
+                setShowExportModal(true);
+              }}
+              className="group text-2xl hover:scale-[101%] transition-all"
+            >
+              <p className="text-primary group-hover:text-secondary">
+                Export
+              </p>
+            </button>
+          </div>
           <div className="flex flex-col justify-center">
             <button
               onClick={(e) => {
@@ -136,6 +167,65 @@ const Planner = () => {
           </FormProvider>
         </Modal>
       )}
+
+      {showExportModal && (
+        <Modal
+          onClose={() => {
+            setShowExportModal(false);
+            setExportName("");
+            setPlannersForExport([]);
+          }}
+        >
+          <div>
+            <div className="mb-4">
+              <h1 className="text-primary text-3xl mb-2">Export Name</h1>
+              <input
+                type="text"
+                className="text-2xl underline text-secondary border border-primary rounded-md px-2 py-2 mb-2"
+                value={exportName}
+                onChange={(e) => {
+                  setExportName(e.target.value);
+                }}
+              />
+            </div>
+            <div className="mb-8">
+              <h1 className="text-primary text-3xl mb-2">Export Order</h1>
+              {plannersForExport.map((planner, index) => (
+                <div key={index} className="text-2xl text-secondary px-4">{index + 1}. {planner.name}</div>
+              ))}
+            </div>
+            <div className="mb-4">
+              <p className="text-lg">Available Planners</p>
+              {planners.map((planner, index) => {
+                const isSelected = plannersForExport.find((_planner) => _planner.id === planner.id);
+                return (
+                  <div key={index} className="py-2 px-4 flex flex-row w-full space-x-4 items-center">
+                    <div onClick={(e) => {
+                      if (isSelected) {
+                        setPlannersForExport(plannersForExport.filter((_planner) => _planner.id !== planner.id));
+                      } else {
+                        setPlannersForExport([...plannersForExport, planner]);
+                      }
+                    }} className={`h-5 aspect-square ${isSelected && "bg-primary"} outline outline-primary rounded-sm`}></div>
+                    <p>
+                      {planner.name}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+            <button
+              onClick={(e) => {
+                exportMany();
+              }}
+              className="bg-primary px-4 py-2 rounded-md text-white"
+            >
+              Export
+            </button>
+          </div>
+        </Modal>
+      )}
+
     </div>
   );
 };
