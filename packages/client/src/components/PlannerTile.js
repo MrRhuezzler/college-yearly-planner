@@ -1,6 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { AiOutlineCloudDownload } from "react-icons/ai";
 import { useState } from "react";
+import Api from "../utils/Api";
+import { PLANNER_EXPORT } from "../utils/Endpoints";
+import { adminPrefix } from "../App";
 
 const PlannerTile = ({ id, name, activities, start_date }) => {
   const navigate = useNavigate();
@@ -13,7 +16,7 @@ const PlannerTile = ({ id, name, activities, start_date }) => {
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        navigate(`/calendar/${year}/planner/${id}`);
+        navigate(`/${adminPrefix}/calendar/${year}/planner/${id}`);
       }}
       onMouseEnter={(e) => {
         setHovered(true);
@@ -33,6 +36,7 @@ const PlannerTile = ({ id, name, activities, start_date }) => {
           <button
             className="text-4xl"
             onClick={(e) => {
+              window.open(PLANNER_EXPORT.replace(":year", year).replace(":id", id));
               e.stopPropagation();
             }}
           >

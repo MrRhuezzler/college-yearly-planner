@@ -6,8 +6,8 @@ const addWeekdaysWithoutHolidays = (holidays, startDate, days) => {
 
     if (
       holidays.includes(currentDate.toLocaleDateString()) ||
-      currentDate.getDay() === 0
-      // currentDate.getDay() === 6
+      currentDate.getDay() === 0 ||
+      currentDate.getDay() === 6
     ) {
       continue;
     }
@@ -21,13 +21,13 @@ const addWeekdaysWithoutHolidays = (holidays, startDate, days) => {
 const differenceWeekdaysWithHolidays = (holidays, startDate, lastDate) => {
   let currentDate = new Date(startDate);
   let count = 0;
-  while (currentDate.toLocaleDateString() !== lastDate.toLocaleDateString()) {
-    currentDate.setDate(currentDate.getDate() + 1);
 
+  while (currentDate.getTime() < lastDate.getTime()) {
+    currentDate.setDate(currentDate.getDate() + 1);
     if (
       holidays.includes(currentDate.toLocaleDateString()) ||
-      currentDate.getDay() === 0
-      // currentDate.getDay() === 6
+      currentDate.getDay() === 0 ||
+      currentDate.getDay() === 6
     ) {
       continue;
     }

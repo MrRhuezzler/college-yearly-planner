@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { adminPrefix } from "../App";
 
 const CalendarTile = ({ year, planner }) => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const CalendarTile = ({ year, planner }) => {
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        navigate(`/calendar/${year}/planner`);
+        navigate(`/${adminPrefix}/calendar/${year}/planner`);
       }}
       className={`group relative aspect-square border-4 rounded-lg ${
         isCurrent ? "border-secondary" : "border-primary"

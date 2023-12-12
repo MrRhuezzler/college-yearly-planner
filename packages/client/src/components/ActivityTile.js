@@ -18,6 +18,7 @@ const ActivityTile = ({
   type: t,
   relativeDays: r,
   relativeDate: rd,
+  relativeToStart: rs,
   date: d,
 }) => {
   const { updateActivity, deleteActivity } = useActivity();
@@ -28,6 +29,7 @@ const ActivityTile = ({
   const [relativeDate, setRelativeDate] = useState(
     rd ? new Date(rd) : new Date()
   );
+  const [relativeToStart, setRelativeToStart] = useState(rs);
   const [date, setDate] = useState(d);
 
   const calculateDiffInDays = (date) => {
@@ -60,7 +62,8 @@ const ActivityTile = ({
     setType(t);
     setRelativeDays(r);
     setRelativeDate(rd ? new Date(rd) : new Date());
-  }, [d, n, t, r, rd]);
+    setRelativeToStart(rs);
+  }, [d, n, t, r, rd, rs]);
 
   return (
     <>
@@ -125,6 +128,7 @@ const ActivityTile = ({
           )}
         </td>
       )}
+      <td className="px-6 py-4">{relativeToStart}</td>
       <td className="px-6 py-4">{new Date(date).toDateString()}</td>
       <td className="px-6 py-4 flex flex-row items-center justify-center space-x-4 text-2xl">
         <button
@@ -133,11 +137,10 @@ const ActivityTile = ({
             setEditMode(!editMode);
             if (editMode) update();
           }}
-          className={`${
-            editMode
-              ? "text-secondary hover:text-primary"
-              : "text-primary hover:text-secondary"
-          }`}
+          className={`${editMode
+            ? "text-secondary hover:text-primary"
+            : "text-primary hover:text-secondary"
+            }`}
         >
           <AiFillEdit />
         </button>

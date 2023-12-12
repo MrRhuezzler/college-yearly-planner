@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { AiOutlineCloudDownload } from "react-icons/ai";
 import { useState } from "react";
+import { adminPrefix } from "../App";
 
 const TemplateTile = ({ id, name, activities }) => {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ const TemplateTile = ({ id, name, activities }) => {
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        navigate(`/template/${id}`);
+        navigate(`/${adminPrefix}/template/${id}`);
       }}
       className={`group relative aspect-square border-4 rounded-lg border-primary hover:bg-primary hover:cursor-pointer p-5 flex flex-col justify-between hover:scale-[102%] transition-all`}
     >
