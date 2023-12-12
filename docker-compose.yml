@@ -14,7 +14,7 @@ services:
 
   api:
     build: packages/server
-    image: mrrhuezzler/cyp-backend
+    image: psgecampus/cyp-backend
     restart: always
     environment:
       - PORT=5000
@@ -27,7 +27,7 @@ services:
 
   app:
     build: packages/client
-    image: mrrhuezzler/cyp-frontend
+    image: psgecampus/cyp-frontend
     restart: always
     ports:
       - "3000:3000"
@@ -37,7 +37,7 @@ services:
 
   nginx:
     build: nginx/
-    image: mrrhuezzler/cyp-nginx
+    image: psgecampus/cyp-nginx
     restart: always
     depends_on:
       - api

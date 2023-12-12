@@ -71,15 +71,18 @@ router.get(
       const plannerObjects = await prisma.planner.findMany({
         where: {
           id: {
-            in: plannersIds
-          }
+            in: plannersIds,
+          },
         },
         include: {
-          activities: { orderBy: { order: "asc" } }, calendar: true
-        }
+          activities: { orderBy: { order: "asc" } },
+          calendar: true,
+        },
       });
 
-      plannerObjects.sort((a, b) => plannersIds.indexOf(a.id) - plannersIds.indexOf(b.id));
+      plannerObjects.sort(
+        (a, b) => plannersIds.indexOf(a.id) - plannersIds.indexOf(b.id)
+      );
 
       if (plannerObjects.length <= 0) {
         throw new Error("Add some planners to export");
@@ -111,7 +114,20 @@ router.get(
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
 
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
       const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
       const TEMPLATE = nunjucks.compile(EXPORT_HTML);
@@ -119,8 +135,12 @@ router.get(
         name: name,
         planners: plannerObjects.map((planner) => {
           const holidays = planner.calendar.holidays;
-          const filteredHolidays = holidays.filter((v) => new Date(v.date).getTime() >= planner.startDate.getTime() && new Date(v.date).getTime() <= planner.lastDate.getTime());
-          const leaves = weekDays.map((v) => (0));
+          const filteredHolidays = holidays.filter(
+            (v) =>
+              new Date(v.date).getTime() >= planner.startDate.getTime() &&
+              new Date(v.date).getTime() <= planner.lastDate.getTime()
+          );
+          const leaves = weekDays.map((v) => 0);
           filteredHolidays.forEach((v) => {
             const newV = new Date(v.date);
             const weekDay = newV.getDay();
@@ -132,18 +152,43 @@ router.get(
 
           let newActivities = planner.activities.map((activity) => {
             const relativeToStart = differenceWeekdaysWithHolidays(
-              (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+              (holidays || []).map((v) =>
+                new Date(v.date).toLocaleDateString()
+              ),
               new Date(planner.startDate),
-              activity.date,
-            )
-            return { name: activity.name, date: `${months[activity.date.getMonth()]} ${activity.date.getDate()}, ${activity.date.getFullYear()}`, relativeToStart }
+              activity.date
+            );
+            return {
+              name: activity.name,
+              date: `${
+                months[activity.date.getMonth()]
+              } ${activity.date.getDate()}, ${activity.date.getFullYear()}`,
+              relativeToStart,
+            };
           });
+
+          let totalInstructionalDays = 0;
+          planner.activities.forEach((activity) => {
+            console.log(activity);
+            if (activity.name === "Last Working Day") {
+              totalInstructionalDays = differenceWeekdaysWithHolidays(
+                (holidays || []).map((v) =>
+                  new Date(v.date).toLocaleDateString()
+                ),
+                new Date(planner.startDate),
+                activity.date
+              );
+            }
+          });
+
+          totalInstructionalDays -= 6;
 
           return {
             leaves,
             name: planner.name,
-            activities: newActivities
-          }
+            activities: newActivities,
+            totalInstructionalDays,
+          };
         }),
         // activities: activities.map((activity) => {
         //   const date = new Date(activity.date);
@@ -154,8 +199,12 @@ router.get(
         //   `${months[activity.date.getMonth()]} ${activity.date.getDate()}, ${activity.date.getFullYear()}`
         //   return { name: activity.name, date: `${months[activity.date.getMonth()]} ${activity.date.getDate()}, ${activity.date.getFullYear()}`, relativeToStart: activity.relativeToStart }
         // }),
-        today: new Date().toLocaleDateString("en-us", { year: "numeric", month: "long", day: "numeric" }),
-        academicYear: `${startDate.getFullYear()} - ${lastDate.getFullYear()}`
+        today: new Date().toLocaleDateString("en-us", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        academicYear: `${startDate.getFullYear()} - ${lastDate.getFullYear()}`,
       });
 
       const page = await browser.newPage();
@@ -167,11 +216,13 @@ router.get(
           left: 30,
           top: 30,
           right: 30,
-        }
+        },
       });
       await browser.close();
 
-      res.attachment(`${name}(${startDate.getFullYear()}-${lastDate.getFullYear()}).pdf`);
+      res.attachment(
+        `${name}(${startDate.getFullYear()}-${lastDate.getFullYear()}).pdf`
+      );
       res.contentType("application/pdf");
       res.send(pdf);
     } catch (error) {
@@ -179,7 +230,6 @@ router.get(
     }
   }
 );
-
 
 router.get(
   `${baseURL}/:id/export`,
@@ -227,9 +277,22 @@ router.get(
       const TEMPLATE = nunjucks.compile(EXPORT_HTML);
       const PAGE_SOURCE = TEMPLATE.render({
         name: plannerobj.name,
-        activities: plannerobj.activities.map((activity) => ({ name: activity.name, date: activity.date.toLocaleDateString("en-us", { year: "numeric", month: "long", day: "numeric" }) })),
-        today: new Date().toLocaleDateString("en-us", { year: "numeric", month: "long", day: "numeric" }),
-        academicYear: `${plannerobj.startDate.getFullYear()} - ${plannerobj.startDate.getFullYear() + 1}`
+        activities: plannerobj.activities.map((activity) => ({
+          name: activity.name,
+          date: activity.date.toLocaleDateString("en-us", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+        })),
+        today: new Date().toLocaleDateString("en-us", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        academicYear: `${plannerobj.startDate.getFullYear()} - ${
+          plannerobj.startDate.getFullYear() + 1
+        }`,
       });
 
       await page.setContent(PAGE_SOURCE);
@@ -240,11 +303,15 @@ router.get(
           left: 30,
           top: 30,
           right: 30,
-        }
+        },
       });
       await browser.close();
 
-      res.attachment(`${plannerobj.name}(${plannerobj.startDate.getFullYear()}-${plannerobj.startDate.getFullYear() + 1}).pdf`);
+      res.attachment(
+        `${plannerobj.name}(${plannerobj.startDate.getFullYear()}-${
+          plannerobj.startDate.getFullYear() + 1
+        }).pdf`
+      );
       res.contentType("application/pdf");
       res.send(pdf);
     } catch (error) {
@@ -287,27 +354,45 @@ router.get(
         lastDate
       );
 
+      // let totalInstructionalDays = 0;
+
       const newActivities = plannerobj.activities.map((activity) => {
         if (activity.date) {
           const relativeToStart = differenceWeekdaysWithHolidays(
             (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
             plannerobj.startDate,
-            activity.date,
-          )
+            activity.date
+          );
 
           return {
             ...activity,
-            relativeToStart
-          }
+            relativeToStart,
+          };
         }
 
         return {
           ...activity,
-          relativeToStart: null
-        }
-      })
+          relativeToStart: null,
+        };
+      });
 
-      plannerobj = { ...plannerobj, activities: newActivities, remainingDays };
+      // newActivities.forEach((activity) => {
+      //   console.log(activity.name);
+      //   if (activity.name === "Last Working Day") {
+      //     totalInstructionalDays = differenceWeekdaysWithHolidays(
+      //       (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+      //       plannerobj.startDate,
+      //       activity.date
+      //     );
+      //   }
+      // });
+
+      plannerobj = {
+        ...plannerobj,
+        activities: newActivities,
+        remainingDays,
+        // totalInstructionalDays,
+      };
 
       res.send(plannerobj);
     } catch (error) {
@@ -365,53 +450,53 @@ router.post(
 
       const DEFAULT_ACTIVITES = [
         {
-          "name": "Reopening for the Academic year 2023-24",
-          "relativeDays": 0
+          name: "Reopening for the Academic year 2023-24",
+          relativeDays: 0,
         },
         {
-          "name": "Attendance Review 1",
-          "relativeDays": 20
+          name: "Attendance Review 1",
+          relativeDays: 20,
         },
         {
-          "name": "Intermediate Feedback 1",
-          "relativeDays": 2
+          name: "Intermediate Feedback 1",
+          relativeDays: 2,
         },
         {
-          "name": "CA 1 From",
-          "relativeDays": 18
+          name: "CA 1 From",
+          relativeDays: 18,
         },
         {
-          "name": "CA 1 Mark Entry",
-          "relativeDays": 10
+          name: "CA 1 Mark Entry",
+          relativeDays: 10,
         },
         {
-          "name": "Attendance Review 2",
-          "relativeDays": 20
+          name: "Attendance Review 2",
+          relativeDays: 20,
         },
         {
-          "name": "Intermediate Feedback 2",
-          "relativeDays": 2
+          name: "Intermediate Feedback 2",
+          relativeDays: 2,
         },
         {
-          "name": "CA 2 From",
-          "relativeDays": 15
+          name: "CA 2 From",
+          relativeDays: 15,
         },
         {
-          "name": "CA 2 Mark Entry",
-          "relativeDays": 2
+          name: "CA 2 Mark Entry",
+          relativeDays: 2,
         },
         {
-          "name": "Attendance Review - Final",
-          "relativeDays": 8
+          name: "Attendance Review - Final",
+          relativeDays: 8,
         },
         {
-          "name": "End Semester Exam",
-          "relativeDays": 0
+          name: "End Semester Exam",
+          relativeDays: 0,
         },
         {
-          "name": "Commencement of Classes for Even Semester",
-          "relativeDays": 20
-        }
+          name: "Commencement of Classes for Even Semester",
+          relativeDays: 20,
+        },
       ];
 
       let startDate = new Date(plannerobj.startDate);
@@ -427,18 +512,20 @@ router.post(
         startDate = newDate;
       }
 
-      const defaultActs = await Promise.all(DEFAULT_ACTIVITES.map((act, index) => {
-        return prisma.activity.create({
-          data: {
-            name: act.name,
-            relativeDays: act.relativeDays,
-            plannerId: plannerobj.id,
-            order: index,
-            type: "RELATIVE",
-            date: calculatedDates[index]
-          }
+      const defaultActs = await Promise.all(
+        DEFAULT_ACTIVITES.map((act, index) => {
+          return prisma.activity.create({
+            data: {
+              name: act.name,
+              relativeDays: act.relativeDays,
+              plannerId: plannerobj.id,
+              order: index,
+              type: "RELATIVE",
+              date: calculatedDates[index],
+            },
+          });
         })
-      }));
+      );
 
       const today = new Date();
       // lastDate = new Date(plannerobj.lastDate);

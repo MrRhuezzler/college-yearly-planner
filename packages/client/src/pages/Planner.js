@@ -16,6 +16,7 @@ import {
   PLANNER_EXPORT_MANY,
   PLANNER_ONE_UPDATE_DELETE,
 } from "../utils/Endpoints";
+import { adminPrefix } from "../App";
 
 const Planner = () => {
   const navigate = useNavigate();
@@ -115,7 +116,7 @@ const Planner = () => {
           <div className="flex flex-col justify-center">
             <button
               onClick={(e) => {
-                navigate(`/calendar/${year}/holidays`);
+                navigate(`/${adminPrefix}/calendar/${year}/holidays`);
               }}
               className="group text-2xl transition-all"
             >

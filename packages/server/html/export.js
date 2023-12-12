@@ -17,7 +17,7 @@ const EXPORT_HTML =
         PSG College of Technology, Coimbatore 641004
       </h3>
       <h4 style="margin-top: 10px; text-transform: uppercase">
-        Tentaive Calendar for Academic Activities {{ academicYear }}
+        Tentative Calendar for Academic Activities {{ academicYear }}
       </h4>
       <h5 style="margin-top: 20px; text-transform: uppercase">{{ name }}</h5>
     </div>
@@ -37,7 +37,7 @@ const EXPORT_HTML =
       <tr>
         <th style="border: 1px solid black; padding: 10px 20px" colspan="2">Activity</th>
         <th style="border: 1px solid black; padding: 10px 20px" colspan="2">Date</th>
-        <th style="border: 1px solid black; padding: 10px 20px" colspan="1">Instructional Days Used</th>
+        <th style="border: 1px solid black; padding: 10px 20px" colspan="1">Working Days Used</th>
       </tr>
       {% for activity in planner.activities %}
         <tr>
@@ -47,7 +47,10 @@ const EXPORT_HTML =
         </tr>
       {% endfor %}
       <tr>
-        <th style="border: 1px solid black; padding: 10px 20px" colspan="5">Number of Public Holidays falling on Weekdays</th>
+        <th style="border: 1px solid black; padding: 10px 20px" colspan="5">Total Number of Instructional Days : {{ planner.totalInstructionalDays }}</th>
+      </tr>
+      <tr>
+        <th style="border: 1px solid black; padding: 10px 20px" colspan="5">Number of Public Holidays falling on Weekdays untill last working day</th>
       </tr>
       <tr>
         <th style="border: 1px solid black; padding: 10px 20px" colspan="1">Monday</th>

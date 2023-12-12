@@ -136,7 +136,7 @@ const ActivitiesProvider = ({ value, setValue, children }) => {
               <th className="py-3">DAYS FROM START</th>
               <th className="py-3">CALCULATED DATE</th>
               <th className="py-3">ACTIONS</th>
-              <th className="py-3">DAYS LEFT</th>
+              <th className="py-3">DAYS LEFT <br/><span className="text-sm">(Including Holidays, Saturdays and Sundays)</span></th>
             </tr>
           </thead>
           <DragDropContext onDragEnd={handleReorder}>
