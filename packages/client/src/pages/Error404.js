@@ -47,7 +47,7 @@ const Error404 = () => {
         Calendars for Odd Semester (2023-2024)
       </h1>
       <div className="flex flex-col items-center text-center text-lg">
-        <Link to="/eyJ5ZWFyIjoiMjAyMyIsImlkIjoiMSJ9">
+        {/* <Link to="/eyJ5ZWFyIjoiMjAyMyIsImlkIjoiMSJ9">
           <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
             Two CA Group - Odd Semester (B.Sc & M.Sc ALL Years, MCA and ME/MTech
             Second year)
@@ -68,7 +68,7 @@ const Error404 = () => {
           <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
             Three CA Group - Odd Semester (2nd Year BE/BTech/BE SW)
           </div>
-        </Link>
+        </Link> */}
         <Link to="/eyJ5ZWFyIjoiMjAyMyIsImlkIjoiOSJ9">
           <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
             First year BE/ BTech / BE SW
