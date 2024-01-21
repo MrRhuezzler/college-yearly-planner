@@ -30,6 +30,16 @@ const Error404 = () => {
         Calendars for Even Semester (2023-2024)
       </h1>
       <div className="flex flex-col items-center text-center text-lg">
+        <Link to="eyJ5ZWFyIjoiMjAyMyIsImlkIjoiMTEifQ==">
+          <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
+            First year ME/MTech & MCA
+          </div>
+        </Link>
+        <Link to="eyJ5ZWFyIjoiMjAyMyIsImlkIjoiMTAifQ==">
+          <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
+            SECOND YEAR BE/BTech (Reg & SW ) including SECOND YEAR Lateral entry
+          </div>
+        </Link>
         <Link to="eyJ5ZWFyIjoiMjAyMyIsImlkIjoiMiJ9">
           <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
             Two CA Group Even Semester (All Years BSc, MSc (2year), MSc (5 year
@@ -81,7 +91,8 @@ const Error404 = () => {
         </Link>
       </div>
       <p className="text-gray-600">
-        *Please click the link above to see the respective tentative academic schedule.
+        *Please click the link above to see the respective tentative academic
+        schedule.
       </p>
     </div>
   );
