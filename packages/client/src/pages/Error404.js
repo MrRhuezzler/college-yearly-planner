@@ -30,6 +30,11 @@ const Error404 = () => {
         Calendars for Even Semester (2023-2024)
       </h1>
       <div className="flex flex-col items-center text-center text-lg">
+        <Link to="eyJ5ZWFyIjoiMjAyMyIsImlkIjoiOCJ9">
+          <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
+            First Year BE / BTech (Reg & SW)
+          </div>
+        </Link>
         <Link to="eyJ5ZWFyIjoiMjAyMyIsImlkIjoiMTEifQ==">
           <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
             First year ME/MTech & MCA
