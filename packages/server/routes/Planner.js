@@ -160,9 +160,8 @@ router.get(
             );
             return {
               name: activity.name,
-              date: `${
-                months[activity.date.getMonth()]
-              } ${activity.date.getDate()}, ${activity.date.getFullYear()}`,
+              date: `${months[activity.date.getMonth()]
+                } ${activity.date.getDate()}, ${activity.date.getFullYear()}`,
               relativeToStart,
             };
           });
@@ -204,7 +203,7 @@ router.get(
           month: "long",
           day: "numeric",
         }),
-        academicYear: `${startDate.getFullYear()} - ${lastDate.getFullYear()}`,
+        // academicYear: `${startDate.getFullYear()} - ${lastDate.getFullYear()}`,
       });
 
       const page = await browser.newPage();
@@ -290,9 +289,8 @@ router.get(
           month: "long",
           day: "numeric",
         }),
-        academicYear: `${plannerobj.startDate.getFullYear()} - ${
-          plannerobj.startDate.getFullYear() + 1
-        }`,
+        // academicYear: `${plannerobj.startDate.getFullYear()} - ${plannerobj.startDate.getFullYear() + 1
+        // }`,
       });
 
       await page.setContent(PAGE_SOURCE);
@@ -308,8 +306,7 @@ router.get(
       await browser.close();
 
       res.attachment(
-        `${plannerobj.name}(${plannerobj.startDate.getFullYear()}-${
-          plannerobj.startDate.getFullYear() + 1
+        `${plannerobj.name}(${plannerobj.startDate.getFullYear()}-${plannerobj.startDate.getFullYear() + 1
         }).pdf`
       );
       res.contentType("application/pdf");
