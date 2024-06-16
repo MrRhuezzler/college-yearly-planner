@@ -398,278 +398,278 @@ router.get(
   }
 );
 
-router.post(
-  baseURL,
-  validateRequest([
-    param("year")
-      .isNumeric()
-      .withMessage("Year must be a valid number")
-      .customSanitizer((value, { req }) => Number(value)),
-    body("startDate")
-      .exists()
-      .withMessage("Start Date is missing")
-      .isISO8601()
-      .withMessage("Start Date must be a valid date"),
-    body("name")
-      .isString()
-      .withMessage("Name must be string")
-      .isLength({ min: 3 })
-      .withMessage("Name must be atleast 3 characters long"),
-    body("totalWorkingDays")
-      .isNumeric()
-      .withMessage("Total working days must be a valid number")
-      .customSanitizer((value, { req }) => Number(value)),
-  ]),
-  async (req, res, next) => {
-    const { year } = req.params;
-    try {
-      const calendar = await prisma.calendar.findUnique({
-        where: { year },
-      });
+// router.post(
+//   baseURL,
+//   validateRequest([
+//     param("year")
+//       .isNumeric()
+//       .withMessage("Year must be a valid number")
+//       .customSanitizer((value, { req }) => Number(value)),
+//     body("startDate")
+//       .exists()
+//       .withMessage("Start Date is missing")
+//       .isISO8601()
+//       .withMessage("Start Date must be a valid date"),
+//     body("name")
+//       .isString()
+//       .withMessage("Name must be string")
+//       .isLength({ min: 3 })
+//       .withMessage("Name must be atleast 3 characters long"),
+//     body("totalWorkingDays")
+//       .isNumeric()
+//       .withMessage("Total working days must be a valid number")
+//       .customSanitizer((value, { req }) => Number(value)),
+//   ]),
+//   async (req, res, next) => {
+//     const { year } = req.params;
+//     try {
+//       const calendar = await prisma.calendar.findUnique({
+//         where: { year },
+//       });
 
-      const holidays = calendar.holidays;
-      const lastDate = addWeekdaysWithoutHolidays(
-        (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
-        req.body.startDate,
-        req.body.totalWorkingDays
-      );
+//       const holidays = calendar.holidays;
+//       const lastDate = addWeekdaysWithoutHolidays(
+//         (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+//         req.body.startDate,
+//         req.body.totalWorkingDays
+//       );
 
-      let plannerobj = await prisma.planner.create({
-        data: {
-          ...req.body,
-          lastDate,
-          calendarYear: year,
-        },
-        include: {
-          activities: { orderBy: { order: "asc" } },
-        },
-      });
+//       let plannerobj = await prisma.planner.create({
+//         data: {
+//           ...req.body,
+//           lastDate,
+//           calendarYear: year,
+//         },
+//         include: {
+//           activities: { orderBy: { order: "asc" } },
+//         },
+//       });
 
-      const DEFAULT_ACTIVITES = [
-        {
-          name: "Reopening for the Academic year 2023-24",
-          relativeDays: 0,
-        },
-        {
-          name: "Attendance Review 1",
-          relativeDays: 20,
-        },
-        {
-          name: "Intermediate Feedback 1",
-          relativeDays: 2,
-        },
-        {
-          name: "CA 1 From",
-          relativeDays: 18,
-        },
-        {
-          name: "CA 1 Mark Entry",
-          relativeDays: 10,
-        },
-        {
-          name: "Attendance Review 2",
-          relativeDays: 20,
-        },
-        {
-          name: "Intermediate Feedback 2",
-          relativeDays: 2,
-        },
-        {
-          name: "CA 2 From",
-          relativeDays: 15,
-        },
-        {
-          name: "CA 2 Mark Entry",
-          relativeDays: 2,
-        },
-        {
-          name: "Attendance Review - Final",
-          relativeDays: 8,
-        },
-        {
-          name: "End Semester Exam",
-          relativeDays: 0,
-        },
-        {
-          name: "Commencement of Classes for Even Semester",
-          relativeDays: 20,
-        },
-      ];
+//       const DEFAULT_ACTIVITES = [
+//         {
+//           name: "Reopening for the Academic year 2023-24",
+//           relativeDays: 0,
+//         },
+//         {
+//           name: "Attendance Review 1",
+//           relativeDays: 20,
+//         },
+//         {
+//           name: "Intermediate Feedback 1",
+//           relativeDays: 2,
+//         },
+//         {
+//           name: "CA 1 From",
+//           relativeDays: 18,
+//         },
+//         {
+//           name: "CA 1 Mark Entry",
+//           relativeDays: 10,
+//         },
+//         {
+//           name: "Attendance Review 2",
+//           relativeDays: 20,
+//         },
+//         {
+//           name: "Intermediate Feedback 2",
+//           relativeDays: 2,
+//         },
+//         {
+//           name: "CA 2 From",
+//           relativeDays: 15,
+//         },
+//         {
+//           name: "CA 2 Mark Entry",
+//           relativeDays: 2,
+//         },
+//         {
+//           name: "Attendance Review - Final",
+//           relativeDays: 8,
+//         },
+//         {
+//           name: "End Semester Exam",
+//           relativeDays: 0,
+//         },
+//         {
+//           name: "Commencement of Classes for Even Semester",
+//           relativeDays: 20,
+//         },
+//       ];
 
-      let startDate = new Date(plannerobj.startDate);
-      const calculatedDates = [];
-      for (let i = 0; i < DEFAULT_ACTIVITES.length; i++) {
-        const defaultAct = DEFAULT_ACTIVITES[i];
-        const newDate = addWeekdaysWithoutHolidays(
-          (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
-          startDate,
-          defaultAct.relativeDays
-        );
-        calculatedDates.push(newDate);
-        startDate = newDate;
-      }
+//       let startDate = new Date(plannerobj.startDate);
+//       const calculatedDates = [];
+//       for (let i = 0; i < DEFAULT_ACTIVITES.length; i++) {
+//         const defaultAct = DEFAULT_ACTIVITES[i];
+//         const newDate = addWeekdaysWithoutHolidays(
+//           (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+//           startDate,
+//           defaultAct.relativeDays
+//         );
+//         calculatedDates.push(newDate);
+//         startDate = newDate;
+//       }
 
-      const defaultActs = await Promise.all(
-        DEFAULT_ACTIVITES.map((act, index) => {
-          return prisma.activity.create({
-            data: {
-              name: act.name,
-              relativeDays: act.relativeDays,
-              plannerId: plannerobj.id,
-              order: index,
-              type: "RELATIVE",
-              date: calculatedDates[index],
-            },
-          });
-        })
-      );
+//       const defaultActs = await Promise.all(
+//         DEFAULT_ACTIVITES.map((act, index) => {
+//           return prisma.activity.create({
+//             data: {
+//               name: act.name,
+//               relativeDays: act.relativeDays,
+//               plannerId: plannerobj.id,
+//               order: index,
+//               type: "RELATIVE",
+//               date: calculatedDates[index],
+//             },
+//           });
+//         })
+//       );
 
-      const today = new Date();
-      // lastDate = new Date(plannerobj.lastDate);
-      today.setHours(0, 0, 0, 0);
-      lastDate.setHours(0, 0, 0, 0);
-      // const holidays = plannerobj.calendar.holidays;
-      const remainingDays = differenceWeekdaysWithHolidays(
-        (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
-        today,
-        lastDate
-      );
+//       const today = new Date();
+//       // lastDate = new Date(plannerobj.lastDate);
+//       today.setHours(0, 0, 0, 0);
+//       lastDate.setHours(0, 0, 0, 0);
+//       // const holidays = plannerobj.calendar.holidays;
+//       const remainingDays = differenceWeekdaysWithHolidays(
+//         (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+//         today,
+//         lastDate
+//       );
 
-      plannerobj = { ...plannerobj, activities: defaultActs, remainingDays };
+//       plannerobj = { ...plannerobj, activities: defaultActs, remainingDays };
 
-      res.send(plannerobj);
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+//       res.send(plannerobj);
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+// );
 
-router.delete(
-  `${baseURL}/:id`,
-  validateRequest([
-    param("year")
-      .isNumeric()
-      .withMessage("Year must be a valid number")
-      .customSanitizer((value, { req }) => Number(value)),
-    param("id")
-      .isNumeric()
-      .withMessage("Id must be a valid number")
-      .customSanitizer((value, { req }) => Number(value)),
-  ]),
-  async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      let plannerobj = await prisma.planner.delete({
-        where: {
-          id: Number(id),
-        },
-        include: { activities: { orderBy: { order: "asc" } } },
-      });
-      res.send(plannerobj);
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+// router.delete(
+//   `${baseURL}/:id`,
+//   validateRequest([
+//     param("year")
+//       .isNumeric()
+//       .withMessage("Year must be a valid number")
+//       .customSanitizer((value, { req }) => Number(value)),
+//     param("id")
+//       .isNumeric()
+//       .withMessage("Id must be a valid number")
+//       .customSanitizer((value, { req }) => Number(value)),
+//   ]),
+//   async (req, res, next) => {
+//     try {
+//       const { id } = req.params;
+//       let plannerobj = await prisma.planner.delete({
+//         where: {
+//           id: Number(id),
+//         },
+//         include: { activities: { orderBy: { order: "asc" } } },
+//       });
+//       res.send(plannerobj);
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+// );
 
-router.put(
-  `${baseURL}/:id`,
-  validateRequest([
-    param("year")
-      .isNumeric()
-      .withMessage("Year must be a valid number")
-      .customSanitizer((value, { req }) => Number(value)),
-    param("id")
-      .isNumeric()
-      .withMessage("Id must be a valid number")
-      .customSanitizer((value, { req }) => Number(value)),
-    body("startDate")
-      .exists()
-      .withMessage("Start Date is missing")
-      .isISO8601()
-      .withMessage("Start Date must be a valid date"),
-    body("name")
-      .isString()
-      .withMessage("Name must be string")
-      .isLength({ min: 3 })
-      .withMessage("Name must be atleast 3 characters long"),
-    body("totalWorkingDays")
-      .isNumeric()
-      .withMessage("Total working days must be a valid number"),
-  ]),
-  async (req, res, next) => {
-    try {
-      const { year, id } = req.params;
+// router.put(
+//   `${baseURL}/:id`,
+//   validateRequest([
+//     param("year")
+//       .isNumeric()
+//       .withMessage("Year must be a valid number")
+//       .customSanitizer((value, { req }) => Number(value)),
+//     param("id")
+//       .isNumeric()
+//       .withMessage("Id must be a valid number")
+//       .customSanitizer((value, { req }) => Number(value)),
+//     body("startDate")
+//       .exists()
+//       .withMessage("Start Date is missing")
+//       .isISO8601()
+//       .withMessage("Start Date must be a valid date"),
+//     body("name")
+//       .isString()
+//       .withMessage("Name must be string")
+//       .isLength({ min: 3 })
+//       .withMessage("Name must be atleast 3 characters long"),
+//     body("totalWorkingDays")
+//       .isNumeric()
+//       .withMessage("Total working days must be a valid number"),
+//   ]),
+//   async (req, res, next) => {
+//     try {
+//       const { year, id } = req.params;
 
-      const calendar = await prisma.calendar.findUnique({
-        where: { year },
-      });
+//       const calendar = await prisma.calendar.findUnique({
+//         where: { year },
+//       });
 
-      let holidays = calendar.holidays;
-      const lastDate = addWeekdaysWithoutHolidays(
-        (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
-        req.body.startDate,
-        req.body.totalWorkingDays
-      );
+//       let holidays = calendar.holidays;
+//       const lastDate = addWeekdaysWithoutHolidays(
+//         (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+//         req.body.startDate,
+//         req.body.totalWorkingDays
+//       );
 
-      let plannerobj = await prisma.planner.update({
-        where: {
-          id,
-        },
-        data: { ...req.body, lastDate },
-        include: { activities: { orderBy: { order: "asc" } }, calendar: true },
-      });
+//       let plannerobj = await prisma.planner.update({
+//         where: {
+//           id,
+//         },
+//         data: { ...req.body, lastDate },
+//         include: { activities: { orderBy: { order: "asc" } }, calendar: true },
+//       });
 
-      let startDate = new Date(plannerobj.startDate);
-      holidays = plannerobj.calendar.holidays;
-      const acitivites = plannerobj.activities;
+//       let startDate = new Date(plannerobj.startDate);
+//       holidays = plannerobj.calendar.holidays;
+//       const acitivites = plannerobj.activities;
 
-      const calculatedDates = [];
+//       const calculatedDates = [];
 
-      for (let i = 0; i < acitivites.length; i++) {
-        const foundActivity = acitivites[i];
-        const newDate = addWeekdaysWithoutHolidays(
-          (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
-          startDate,
-          foundActivity.relativeDays
-        );
-        calculatedDates.push({ id: foundActivity.id, date: newDate });
-        startDate = newDate;
-      }
+//       for (let i = 0; i < acitivites.length; i++) {
+//         const foundActivity = acitivites[i];
+//         const newDate = addWeekdaysWithoutHolidays(
+//           (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+//           startDate,
+//           foundActivity.relativeDays
+//         );
+//         calculatedDates.push({ id: foundActivity.id, date: newDate });
+//         startDate = newDate;
+//       }
 
-      const updatedActivities = await Promise.all(
-        calculatedDates.map((v, index) => {
-          return prisma.activity.update({
-            where: {
-              id: v.id,
-            },
-            data: {
-              date: v.date,
-              order: index,
-            },
-          });
-        })
-      );
+//       const updatedActivities = await Promise.all(
+//         calculatedDates.map((v, index) => {
+//           return prisma.activity.update({
+//             where: {
+//               id: v.id,
+//             },
+//             data: {
+//               date: v.date,
+//               order: index,
+//             },
+//           });
+//         })
+//       );
 
-      const today = new Date();
-      // lastDate = new Date(plannerobj.lastDate);
-      today.setHours(0, 0, 0, 0);
-      lastDate.setHours(0, 0, 0, 0);
-      // const holidays = plannerobj.calendar.holidays;
-      const remainingDays = differenceWeekdaysWithHolidays(
-        (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
-        today,
-        lastDate
-      );
+//       const today = new Date();
+//       // lastDate = new Date(plannerobj.lastDate);
+//       today.setHours(0, 0, 0, 0);
+//       lastDate.setHours(0, 0, 0, 0);
+//       // const holidays = plannerobj.calendar.holidays;
+//       const remainingDays = differenceWeekdaysWithHolidays(
+//         (holidays || []).map((v) => new Date(v.date).toLocaleDateString()),
+//         today,
+//         lastDate
+//       );
 
-      plannerobj = { ...plannerobj, remainingDays };
+//       plannerobj = { ...plannerobj, remainingDays };
 
-      res.send({ ...plannerobj, activities: updatedActivities });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+//       res.send({ ...plannerobj, activities: updatedActivities });
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+// );
 
 // router.patch(
 //   `${baseURL}/:id`,
