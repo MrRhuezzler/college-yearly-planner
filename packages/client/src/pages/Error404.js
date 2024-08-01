@@ -30,6 +30,16 @@ const Error404 = () => {
         Calendars for Odd Semester (2024-2025)
       </h1>
       <div className="flex flex-col items-center text-center text-lg">
+        <Link to="eyJ5ZWFyIjoiMjAyNCIsImlkIjoiMTQifQ==">
+          <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
+            Second year BE/BTech/BE SW and First year ME/MTech/MCA
+          </div>
+        </Link>
+        <Link to="eyJ5ZWFyIjoiMjAyNCIsImlkIjoiMTUifQ==">
+          <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
+            Fourth year BE SW
+          </div>
+        </Link>
         <Link to="eyJ5ZWFyIjoiMjAyNCIsImlkIjoiMTMifQ==">
           <div className="px-4 py-2 bg-secondary rounded-lg mb-4">
             All years B.Sc, M.Sc (2 year), M.Sc (5 year) and II year ME/MTech/MCA
